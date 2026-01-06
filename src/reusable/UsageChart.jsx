@@ -111,7 +111,7 @@ const dataValues = chartData.map((u) => u.seconds);
   };
 
   return (
-    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-100">
+    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-100 overflow-y-hidden">
       {/* Tabs */}
       <div className="flex gap-4 mb-8">
         {["daily", "weekly", "monthly", "yearly"].map((p) => (

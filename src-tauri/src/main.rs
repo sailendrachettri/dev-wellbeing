@@ -21,6 +21,26 @@ use windows::{
     },
 };
 
+
+
+fn main() {
+    //  db::populate_dummy_data();
+     
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![
+            get_active_app,
+            save_app_usage,
+            get_usage_today,
+            get_usage_weekly,
+            get_usage_monthly,
+            get_usage_yearly
+        ])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri app");
+}
+
+
+
 #[command]
 fn save_app_usage(app_name: String, seconds: i64) {
     let today = Local::now().format("%Y-%m-%d").to_string();
@@ -31,6 +51,22 @@ fn save_app_usage(app_name: String, seconds: i64) {
 fn get_usage_today() -> Vec<db::AppUsage> {
     db::get_usage_today().unwrap_or_default()
 }
+
+#[command]
+fn get_usage_weekly() -> Vec<db::AppUsage> {
+    db::get_usage_period("week").unwrap_or_default()
+}
+
+#[command]
+fn get_usage_monthly() -> Vec<db::AppUsage> {
+    db::get_usage_period("month").unwrap_or_default()
+}
+
+#[command]
+fn get_usage_yearly() -> Vec<db::AppUsage> {
+    db::get_usage_period("year").unwrap_or_default()
+}
+
 
 #[command]
 fn get_active_app() -> Option<String> {
@@ -71,13 +107,3 @@ fn get_active_app() -> Option<String> {
     }
 }
 
-fn main() {
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![
-            get_active_app,
-            save_app_usage,
-            get_usage_today
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri app");
-}

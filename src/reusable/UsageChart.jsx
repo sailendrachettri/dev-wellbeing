@@ -98,7 +98,7 @@ const UsageChart = () => {
   };
 
   return (
-    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-[400px]">
+    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-100">
       {/* Tabs */}
       <div className="flex gap-4 mb-8">
         {["daily", "weekly", "monthly", "yearly"].map((p) => (
@@ -108,7 +108,7 @@ const UsageChart = () => {
             className={`px-4 py-2 rounded-md font-semibold transition ${
               period === p
                 ? "bg-emerald-400 text-zinc-900"
-                : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
+                : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 cursor-pointer"
             }`}
           >
             {p.charAt(0).toUpperCase() + p.slice(1)}

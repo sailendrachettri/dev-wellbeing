@@ -13,6 +13,13 @@ import {
 import { formatSeconds } from "../utils/date-time/formatSeconds";
 import { formatAppName } from "../utils/string-formate/formatAppName";
 
+const LIMITS = {
+  daily: 8,
+  weekly: 7,
+  monthly: 9,
+  yearly: 10,
+};
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,6 +40,11 @@ const UsageChart = () => {
   const [usage, setUsage] = useState([]);
   const [period, setPeriod] = useState("daily"); // default tab
 
+  const limit = LIMITS[period] ?? usage.length;
+  const chartData = [...usage]
+  .sort((a, b) => b.seconds - a.seconds)
+  .slice(0, limit);
+
   // Fetch usage data for selected period
   useEffect(() => {
     const fetchData = async () => {
@@ -45,8 +57,8 @@ const UsageChart = () => {
     fetchData();
   }, [period]);
 
-  const labels = usage.map((u) => formatAppName(u.app));
-  const dataValues = usage.map((u) => u.seconds);
+ const labels = chartData.map((u) => formatAppName(u.app));
+const dataValues = chartData.map((u) => u.seconds);
 
   const data = {
     labels,
@@ -88,6 +100,7 @@ const UsageChart = () => {
         ticks: {
           color: "#d1d5db",
           callback: (value) => formatSeconds(value),
+          
         },
         grid: {
           color: "rgba(255, 255, 255, 0.06)", // 👈 subtle horizontal lines

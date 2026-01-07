@@ -66,7 +66,7 @@ const dataValues = chartData.map((u) => u.seconds);
       {
         label: "Usage",
         data: dataValues,
-        backgroundColor: "rgba(16, 185, 129, 0.7)", // emerald-400
+        backgroundColor: "rgba(16, 185, 129, 0.7)", // primary
         borderColor: "rgba(16, 185, 129, 1)",
         borderWidth: 1,
       },
@@ -111,7 +111,7 @@ const dataValues = chartData.map((u) => u.seconds);
   };
 
   return (
-    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-100">
+    <div className="bg-zinc-900 text-white rounded-lg shadow-md min-h-100 p-6">
       {/* Tabs */}
       <div className="flex gap-4 mb-8">
         {["daily", "weekly", "monthly", "yearly"].map((p) => (
@@ -120,7 +120,7 @@ const dataValues = chartData.map((u) => u.seconds);
             onClick={() => setPeriod(p)}
             className={`px-4 py-2 rounded-md font-semibold transition ${
               period === p
-                ? "bg-emerald-400 text-zinc-900"
+                ? "bg-primary text-zinc-900"
                 : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 cursor-pointer"
             }`}
           >

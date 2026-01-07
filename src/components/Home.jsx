@@ -39,8 +39,8 @@ const Home = () => {
           selectedDate={selectedDate}
         />
         <DailyAppUsesChart date={selectedDate} />
-        {/* <UsageChart /> */}
       </div>
+        {/* <UsageChart /> */}
     </div>
   );
 };

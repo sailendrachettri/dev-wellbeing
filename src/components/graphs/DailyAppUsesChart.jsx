@@ -37,7 +37,7 @@ const DailyAppUsesChart = ({ date }) => {
           <p className="text-sm text-gray-400">{formatPrettyDate(date)}</p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-emerald-400">{formatSeconds(totalSeconds)}</div>
+          <div className="text-3xl font-bold text-primary">{formatSeconds(totalSeconds)}</div>
           <div className="text-xs text-gray-500">total time</div>
         </div>
       </div>
@@ -70,7 +70,7 @@ const DailyAppUsesChart = ({ date }) => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold text-emerald-400">
+                    <div className="text-lg font-bold text-primary">
                       {formatSeconds(app.seconds)}
                     </div>
                   </div>

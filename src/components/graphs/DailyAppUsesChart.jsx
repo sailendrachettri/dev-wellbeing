@@ -28,7 +28,7 @@ const DailyAppUsesChart = ({ date }) => {
   const totalHours = (totalSeconds / 3600).toFixed(1);
 
   return (
-    <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-2xl p-6 mt-6 shadow-2xl border border-zinc-800">
+    <div className="bg-linear-to-br from-zinc-900 via-zinc-900 to-zinc-800 rounded-2xl p-6 mt-6 shadow-2xl border border-zinc-800">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -52,7 +52,6 @@ const DailyAppUsesChart = ({ date }) => {
         <div className="space-y-4">
           {apps?.map((app, idx) => {
             const percent = Math.round((app.seconds / totalSeconds) * 100);
-            const hours = (app.seconds / 3600).toFixed(1);
 
             return (
               <div
@@ -73,7 +72,7 @@ const DailyAppUsesChart = ({ date }) => {
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold text-emerald-400">
-                      {hours}h
+                      {formatSeconds(app.seconds)}
                     </div>
                   </div>
                 </div>

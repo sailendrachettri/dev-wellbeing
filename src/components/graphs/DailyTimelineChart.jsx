@@ -11,6 +11,7 @@ import {
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { getWeekRange } from "../../utils/date-time/getWeekRange";
 import { useRef } from "react";
+import { getTodayDate } from "../../utils/date-time/getTodayDate";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -62,13 +63,24 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     );
 
   const values = [...data].reverse().map((d) => d.total_seconds);
+  const reversedData = [...data].reverse();
+
+  const backgroundColors = reversedData.map(
+    (d) =>
+      d.date === selectedDate
+        ? "#14d595" // highlighted bar
+        : "rgba(20, 213, 149, 0.65)" // faded bars
+  );
 
   const chartData = {
     labels,
     datasets: [
       {
         data: values,
-        backgroundColor: `#14d595`,
+        backgroundColor: backgroundColors,
+        borderColor: reversedData.map((d) =>
+          d.date === selectedDate ? "#ffffff" : "transparent"
+        ),
         borderRadius: 6,
         barThickness: 28,
       },
@@ -111,7 +123,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   };
 
   return (
-    <div className="bg-zinc-900 rounded-xl p-6 shadow-lg">
+    <div className="bg-zinc-900 rounded-xl px-6 shadow-lg">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>

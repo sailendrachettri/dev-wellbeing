@@ -158,7 +158,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
         <div className="flex gap-2">
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700"
+            className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700 cursor-pointer"
           >
             ← Prev
           </button>
@@ -166,7 +166,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
           <button
             disabled={page === 0}
             onClick={() => setPage((p) => Math.max(0, p - 1))}
-            className="px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700 disabled:opacity-40"
+            className={`${page === 0 ? 'cursor-not-allowed' : 'cursor-pointer'} px-3 py-1 bg-zinc-800 rounded hover:bg-zinc-700 disabled:opacity-40`}
           >
             Next →
           </button>

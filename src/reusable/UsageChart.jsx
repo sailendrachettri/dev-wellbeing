@@ -121,7 +121,7 @@ const dataValues = chartData.map((u) => u.seconds);
             className={`px-4 py-2 rounded-md font-semibold transition ${
               period === p
                 ? "bg-primary text-zinc-900"
-                : "bg-zinc-800 text-gray-300 hover:bg-zinc-700 cursor-pointer"
+                : "bg-dark text-gray-300 hover:bg-zinc-700 cursor-pointer"
             }`}
           >
             {p.charAt(0).toUpperCase() + p.slice(1)}

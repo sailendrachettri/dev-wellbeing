@@ -27,7 +27,7 @@ const DailyAppUsesChart = ({ date }) => {
   const totalSeconds = apps.reduce((acc, a) => acc + a.seconds, 0) || 1;
 
   return (
-    <div className="bg-linear-to-br from-zinc-900 mt-16 via-zinc-900 to-zinc-800 rounded-2xl p-6 shadow-2xl border border-zinc-800">
+    <div className="bg-linear-to-br from-zinc-900 mt-16 via-zinc-900 to-dark rounded-2xl p-6 shadow-2xl border border-dark">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -55,7 +55,7 @@ const DailyAppUsesChart = ({ date }) => {
             return (
               <div
                 key={app.app}
-                className="bg-zinc-800/50 backdrop-blur rounded-xl p-4 hover:bg-zinc-800/70 transition-all duration-300 border border-zinc-700/50"
+                className="bg-dark/50 backdrop-blur rounded-xl p-4 hover:bg-dark/70 transition-all duration-300 border border-zinc-700/50"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ const DailyAppUsesChart = ({ date }) => {
                 {/* Modern Progress Bar */}
                 <div className="relative h-2 bg-zinc-700/50 rounded-full overflow-hidden">
                   <div
-                    className={`absolute inset-y-0 left-0 bg-gradient-to-r ${colors[idx % colors.length]} rounded-full transition-all duration-700 ease-out shadow-lg`}
+                    className={`absolute inset-y-0 left-0 bg-linear-to-r ${colors[idx % colors.length]} rounded-full transition-all duration-700 ease-out shadow-lg`}
                     style={{ width: `${percent}%` }}
                   >
                     <div className="absolute inset-0 bg-white/20 animate-pulse"></div>

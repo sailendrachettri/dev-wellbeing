@@ -4,7 +4,6 @@ mod db;
 
 use chrono::Local;
 use tauri::command;
-use tauri::Manager;
 
 use windows::{
     core::PWSTR,
@@ -20,15 +19,12 @@ fn main() {
     //  db::populate_dummy_data();
 
     tauri::Builder::default()
-        .setup(|app| {
-            let log_dir = app.path().app_log_dir().unwrap();
-            println!("Log dir: {:?}", log_dir);
-            Ok(())
-        })
         .invoke_handler(tauri::generate_handler![
             get_active_app,
             save_app_usage,
             get_usage_today,
+            get_usage_by_date,
+            get_daily_usage,
             get_usage_weekly,
             get_usage_monthly,
             get_usage_yearly
@@ -37,9 +33,20 @@ fn main() {
         .expect("error while running tauri app");
 }
 
+// daily uses with pagination just like in android digital wellbeing
+#[command]
+fn get_daily_usage(limit: i64, offset: i64) -> Vec<db::DailyTotalUsage> {
+    db::get_daily_totals(limit, offset).unwrap_or_default()
+}
+
+#[command]
+fn get_usage_by_date(date: String) -> Vec<db::AppUsage> {
+    db::get_usage_by_date(&date).unwrap_or_default()
+}
+
+
 #[command]
 fn save_app_usage(app_name: String, seconds: i64) {
-     println!("SAVE CALLED → {} {}s", app_name, seconds);
     let today = Local::now().format("%Y-%m-%d").to_string();
     db::add_usage(&app_name, &today, seconds);
 }

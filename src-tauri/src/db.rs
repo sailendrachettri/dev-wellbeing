@@ -1,6 +1,5 @@
-use rand::Rng;
+
 use rusqlite::{params, Connection, Result};
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 fn get_db() -> Result<Connection> {
@@ -24,10 +23,70 @@ fn get_db() -> Result<Connection> {
     Ok(conn)
 }
 
+
+#[derive(serde::Serialize)]
+pub struct DailyTotalUsage {
+    pub date: String,      // "2026-01-07"
+    pub total_seconds: i64,
+}
+
+pub fn get_daily_totals(limit: i64, offset: i64) -> rusqlite::Result<Vec<DailyTotalUsage>> {
+    let conn = get_db()?;
+
+    let mut stmt = conn.prepare(
+        "
+        SELECT date, SUM(usage_seconds) as total_seconds
+        FROM app_usage
+        GROUP BY date
+        ORDER BY date DESC
+        LIMIT ? OFFSET ?
+        "
+    )?;
+
+    let rows = stmt.query_map([limit, offset], |row| {
+        Ok(DailyTotalUsage {
+            date: row.get(0)?,
+            total_seconds: row.get(1)?,
+        })
+    })?;
+
+    let mut result = Vec::new();
+    for row in rows {
+        result.push(row?);
+    }
+
+    Ok(result)
+}
+
+pub fn get_usage_by_date(date: &str) -> Result<Vec<AppUsage>> {
+    let conn = get_db()?;
+
+    let mut stmt = conn.prepare(
+        "SELECT app_name, usage_seconds
+         FROM app_usage
+         WHERE date = ?
+         ORDER BY usage_seconds DESC",
+    )?;
+
+    let rows = stmt.query_map([date], |row| {
+        Ok(AppUsage {
+            app: row.get(0)?,
+            seconds: row.get(1)?,
+        })
+    })?;
+
+    let mut result = Vec::new();
+    for row in rows {
+        result.push(row?);
+    }
+
+    Ok(result)
+}
+
+
 pub fn add_usage(app_name: &str, date: &str, seconds: i64) {
     let conn = get_db().unwrap();
 
-     println!("Adding data date: {}", date);
 
     let updated = conn
         .execute(
@@ -54,6 +113,7 @@ pub struct AppUsage {
     pub seconds: i64,
 }
 
+/*
 pub fn populate_dummy_data() {
     use chrono::Duration;
     let conn = get_db().unwrap();
@@ -111,11 +171,11 @@ pub fn populate_dummy_data() {
 
     println!("Dummy data inserted!");
 }
+ */
 
 pub fn get_usage_today() -> Result<Vec<AppUsage>> {
     let conn = get_db()?;
     let today = chrono::Local::now().format("%Y-%m-%d").to_string();
-    println!("Fetching usage for date: {}", today);
     let mut stmt = conn.prepare(
         "SELECT app_name, usage_seconds
          FROM app_usage

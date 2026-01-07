@@ -1,13 +1,18 @@
 import { useEffect } from "react";
 import UsageChart from "../reusable/UsageChart";
 import { invoke } from "@tauri-apps/api/core";
+import DailyTimelineChart from "./graphs/DailyTimelineChart";
+import DailyAppUsesChart from "./graphs/DailyAppUsesChart";
+import { useState } from "react";
 
 const Home = () => {
+  const [selectedDate, setSelectedDate] = useState(null);
+  console.log({selectedDate})
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
         const app = await invoke("get_active_app");
-        console.log("checking..")
 
         if (app) {
           await invoke("save_app_usage", {
@@ -29,7 +34,9 @@ const Home = () => {
       <h1 className="text-2xl font-bold text-emerald-400">📊 App Usage</h1>
 
       <div className="pt-4">
-        <UsageChart />
+        <DailyTimelineChart setSelectedDate={setSelectedDate} />
+        <DailyAppUsesChart date={selectedDate}/>
+        {/* <UsageChart /> */}
       </div>
     </div>
   );

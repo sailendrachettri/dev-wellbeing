@@ -1,3 +1,5 @@
+import { formatPrettyDate } from "./formatPrettyDate";
+
 export const getWeekRange = (page = 0) => {
   const today = new Date();
 
@@ -8,15 +10,8 @@ export const getWeekRange = (page = 0) => {
   const start = new Date(end);
   start.setDate(end.getDate() - 6);
 
-  const format = (d) =>
-    d.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-
   return {
-    startLabel: format(start),
-    endLabel: format(end),
+    startLabel: formatPrettyDate(start),
+    endLabel: formatPrettyDate(end),
   };
 };

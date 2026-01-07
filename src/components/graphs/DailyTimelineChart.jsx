@@ -11,7 +11,6 @@ import {
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { getWeekRange } from "../../utils/date-time/getWeekRange";
 import { useRef } from "react";
-import { getTodayDate } from "../../utils/date-time/getTodayDate";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -76,6 +75,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     labels,
     datasets: [
       {
+        label: "Usage Time",
         data: values,
         backgroundColor: backgroundColors,
         borderColor: reversedData.map((d) =>
@@ -99,6 +99,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     },
 
     plugins: {
+      legend: {
+        display: false,
+      },
       tooltip: {
         callbacks: {
           label: (ctx) => formatSeconds(ctx.raw),
@@ -125,10 +128,10 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   return (
     <div className="bg-zinc-900 rounded-xl px-6 shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-10">
         <div>
-          <h2 className="text-lg font-semibold text-emerald-400">
-            Daily Usage Timeline
+          <h2 className="text-xl font-bold text-white">
+            Weekly Usage Timeline
           </h2>
           <p className="text-sm text-gray-400">
             {startLabel} – {endLabel}

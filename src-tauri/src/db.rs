@@ -1,8 +1,7 @@
+use rand::Rng;
 use rusqlite::{params, Connection, Result};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use rand::Rng;
-
 
 fn get_db() -> Result<Connection> {
     let mut path: PathBuf = dirs::data_dir().expect("no data dir");
@@ -28,19 +27,24 @@ fn get_db() -> Result<Connection> {
 pub fn add_usage(app_name: &str, date: &str, seconds: i64) {
     let conn = get_db().unwrap();
 
-    let updated = conn.execute(
-        "UPDATE app_usage
+     println!("Adding data date: {}", date);
+
+    let updated = conn
+        .execute(
+            "UPDATE app_usage
          SET usage_seconds = usage_seconds + ?
          WHERE app_name = ? AND date = ?",
-        params![seconds, app_name, date],
-    ).unwrap();
+            params![seconds, app_name, date],
+        )
+        .unwrap();
 
     if updated == 0 {
         conn.execute(
             "INSERT INTO app_usage (app_name, date, usage_seconds)
              VALUES (?, ?, ?)",
             params![app_name, date, seconds],
-        ).unwrap();
+        )
+        .unwrap();
     }
 }
 
@@ -49,6 +53,7 @@ pub struct AppUsage {
     pub app: String,
     pub seconds: i64,
 }
+
 pub fn populate_dummy_data() {
     use chrono::Duration;
     let conn = get_db().unwrap();
@@ -73,7 +78,9 @@ pub fn populate_dummy_data() {
 
     // Weekly usage
     for i in 1..=7 {
-        let date = (chrono::Local::now() - Duration::days(i)).format("%Y-%m-%d").to_string();
+        let date = (chrono::Local::now() - Duration::days(i))
+            .format("%Y-%m-%d")
+            .to_string();
         for app in &apps {
             let mins = rng.gen_range(30..120);
             add_usage(app, &date, mins as i64 * 60);
@@ -82,7 +89,9 @@ pub fn populate_dummy_data() {
 
     // Monthly usage
     for i in 1..=30 {
-        let date = (chrono::Local::now() - Duration::days(i)).format("%Y-%m-%d").to_string();
+        let date = (chrono::Local::now() - Duration::days(i))
+            .format("%Y-%m-%d")
+            .to_string();
         for app in &apps {
             let mins = rng.gen_range(60..180);
             add_usage(app, &date, mins as i64 * 60);
@@ -91,7 +100,9 @@ pub fn populate_dummy_data() {
 
     // Yearly usage (sample every 10 days)
     for i in (0..365).step_by(10) {
-        let date = (chrono::Local::now() - Duration::days(i)).format("%Y-%m-%d").to_string();
+        let date = (chrono::Local::now() - Duration::days(i))
+            .format("%Y-%m-%d")
+            .to_string();
         for app in &apps {
             let mins = rng.gen_range(120..300);
             add_usage(app, &date, mins as i64 * 60);
@@ -101,11 +112,10 @@ pub fn populate_dummy_data() {
     println!("Dummy data inserted!");
 }
 
-
 pub fn get_usage_today() -> Result<Vec<AppUsage>> {
     let conn = get_db()?;
     let today = chrono::Local::now().format("%Y-%m-%d").to_string();
-
+    println!("Fetching usage for date: {}", today);
     let mut stmt = conn.prepare(
         "SELECT app_name, usage_seconds
          FROM app_usage

@@ -7,7 +7,6 @@ import { useState } from "react";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(null);
-  console.log({selectedDate})
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -34,7 +33,7 @@ const Home = () => {
       <h1 className="text-2xl font-bold text-emerald-400">📊 App Usage</h1>
 
       <div className="pt-4">
-        <DailyTimelineChart setSelectedDate={setSelectedDate} />
+        <DailyTimelineChart setSelectedDate={setSelectedDate} selectedDate={selectedDate} />
         <DailyAppUsesChart date={selectedDate}/>
         {/* <UsageChart /> */}
       </div>

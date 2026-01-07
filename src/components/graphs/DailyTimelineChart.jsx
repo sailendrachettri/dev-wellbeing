@@ -16,35 +16,29 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-const DailyTimelineChart = ({ setSelectedDate }) => {
+const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0); // pagination (week index)
   const { startLabel, endLabel } = getWeekRange(page);
   const chartRef = useRef(null);
 
   const handleBarClick = (event) => {
-    // console.log("clicked", event)
     const chart = chartRef.current;
     if (!chart) return;
 
-    const points = chart.getElementsAtEventForMode(
-      event.native,
+    const elements = chart.getElementsAtEventForMode(
+      event.nativeEvent,
       "nearest",
       { intersect: true },
       true
     );
 
-    console.log(points)
+    if (!elements.length) return;
 
-    if (!points.length) return;
+    const index = elements[0].index;
+    const selectedDate = [...data].reverse()[index].date;
 
-    const index = points[0].index;
-
-    // Map index → actual date
-    const selected = [...data].reverse()[index].date;
-    console.log({selected})
-
-    setSelectedDate(selected);
+    setSelectedDate(selectedDate);
   };
 
   useEffect(() => {
@@ -74,7 +68,7 @@ const DailyTimelineChart = ({ setSelectedDate }) => {
     datasets: [
       {
         data: values,
-        backgroundColor: "rgba(16,185,129,0.75)",
+        backgroundColor: `#14d595`,
         borderRadius: 6,
         barThickness: 28,
       },
@@ -84,19 +78,12 @@ const DailyTimelineChart = ({ setSelectedDate }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    onHover: (event) => {
-      const chart = chartRef.current;
-      if (!chart) return;
 
-      event.native.target.style.cursor =
-        chart.getElementsAtEventForMode(
-          event.native,
-          "nearest",
-          { intersect: true },
-          true
-        ).length > 0
-          ? "pointer"
-          : "default";
+    onHover: (_, activeElements, chart) => {
+      if (!chart?.canvas) return;
+
+      chart.canvas.style.cursor =
+        activeElements.length > 0 ? "pointer" : "default";
     },
 
     plugins: {

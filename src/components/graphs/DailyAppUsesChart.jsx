@@ -5,8 +5,6 @@ import { formatSeconds } from "../../utils/date-time/formatSeconds";
 
 const DailyAppUsesChart = ({ date }) => {
   const [apps, setApps] = useState([]);
-  console.log({date})
-
   useEffect(() => {
     if (!date) return;
 

@@ -15,6 +15,7 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
+
 fn main() {
     //  db::populate_dummy_data();
 

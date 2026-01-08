@@ -65,7 +65,7 @@ fn main() {
 }
 
 fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
-    let open = MenuItem::with_id(app, "open", "Open Dashboard", true, Option::<&str>::None)?;
+    let open = MenuItem::with_id(app, "open", "Open App", true, Option::<&str>::None)?;
 
     let quit = MenuItem::with_id(app, "quit", "Quit", true, Option::<&str>::None)?;
     let menu = Menu::with_items(app, &[&open, &PredefinedMenuItem::separator(app)?, &quit])?;

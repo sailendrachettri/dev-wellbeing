@@ -67,7 +67,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   const backgroundColors = reversedData.map(
     (d) =>
       d.date === selectedDate
-        ? "#14d595" // highlighted bar
+        ? "red" // highlighted bar
         : "rgba(20, 213, 149, 0.65)" // faded bars
   );
 

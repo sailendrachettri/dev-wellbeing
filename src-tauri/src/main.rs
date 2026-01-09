@@ -3,6 +3,7 @@
 mod db;
 use chrono::Local;
 use tauri::{
+    image::Image,
     command,
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
@@ -34,21 +35,21 @@ fn main() {
             setup_tray(&handle)?;
 
             if let Some(win) = app.get_webview_window("main") {
-                win.hide()?;
+                win.show()?;
+                win.set_focus()?;
             }
 
             Ok(())
         })
         // -------- HIDE ON CLOSE --------
         .on_window_event(|app, event| {
-    if let WindowEvent::CloseRequested { api, .. } = event {
-        if let Some(win) = app.get_webview_window("main") {
-            let _ = win.hide();
-        }
-        api.prevent_close();
-    }
-})
-
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                if let Some(win) = app.get_webview_window("main") {
+                    let _ = win.hide();
+                }
+                api.prevent_close();
+            }
+        })
         // ---------------- Commands ----------------
         .invoke_handler(tauri::generate_handler![
             get_active_app,
@@ -63,30 +64,39 @@ fn main() {
 
 fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     let open = MenuItem::with_id(app, "open", "Open App", true, Option::<&str>::None)?;
-
     let quit = MenuItem::with_id(app, "quit", "Quit", true, Option::<&str>::None)?;
     let menu = Menu::with_items(app, &[&open, &PredefinedMenuItem::separator(app)?, &quit])?;
 
+    let total_seconds = get_today_total_seconds();
+    let tooltip_text = format!("Today: {}", format_seconds_hm(total_seconds));
+
+    // Load icon - use Image::from_path for Tauri v2
+    let icon = Image::from_path("icons/icon.ico")?;
+    
+    let app_handle = app.clone();
     TrayIconBuilder::new()
+        .icon(icon)
+        .tooltip(&tooltip_text)
         .menu(&menu)
-        .on_menu_event(|app, event| match event.id().as_ref() {
-            "open" => {
-                if let Some(win) = app.get_webview_window("main") {
-                    win.show().unwrap();
-                    win.set_focus().unwrap();
+        .on_menu_event(move |app, event| {
+            match event.id.as_ref() {
+                "open" => {
+                    if let Some(win) = app.get_webview_window("main") {
+                        let _ = win.show();
+                        let _ = win.set_focus();
+                    }
                 }
+                "quit" => {
+                    app.exit(0);
+                }
+                _ => {}
             }
-            "quit" => {
-                app.exit(0);
-            }
-            _ => {}
         })
-        .on_tray_icon_event(|tray, event| {
+        .on_tray_icon_event(move |tray, event| {
             if let TrayIconEvent::DoubleClick { .. } = event {
-                let app = tray.app_handle();
-                if let Some(win) = app.get_webview_window("main") {
-                    win.show().unwrap();
-                    win.set_focus().unwrap();
+                if let Some(win) = app_handle.get_webview_window("main") {
+                    let _ = win.show();
+                    let _ = win.set_focus();
                 }
             }
         })
@@ -95,14 +105,25 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     Ok(())
 }
 
+#[command]
+fn get_today_total_seconds() -> i64 {
+    let usage = db::get_usage_today().unwrap_or_default();
+    usage.iter().map(|u| u.seconds).sum()
+}
+
+fn format_seconds_hm(seconds: i64) -> String {
+    let hours = seconds / 3600;
+    let minutes = (seconds % 3600) / 60;
+    format!("{}h {}m", hours, minutes)
+}
+
 // daily uses with pagination just like in android digital wellbeing
 #[command]
 fn get_week_timeline_usage(
     start_of_week: String, // "YYYY-MM-DD"
-    end_of_week: String    // "YYYY-MM-DD"
+    end_of_week: String,   // "YYYY-MM-DD"
 ) -> Vec<db::DailyTotalUsage> {
-    db::get_week_timeline_usage(&start_of_week, &end_of_week)
-        .unwrap_or_default()
+    db::get_week_timeline_usage(&start_of_week, &end_of_week).unwrap_or_default()
 }
 
 #[command]

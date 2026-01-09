@@ -21,21 +21,19 @@ const DailyAppUsesChart = ({ date }) => {
 
     let isMounted = true;
 
-    // fetch initial data
     invoke("get_usage_by_date", { date })
       .then((data) => {
         if (isMounted) setApps(data);
       })
       .catch(console.error);
 
-    // update every second
     const interval = setInterval(() => {
       invoke("get_usage_by_date", { date })
         .then((data) => {
           if (isMounted) setApps(data);
         })
         .catch(console.error);
-    }, 5000); // every 1 second
+    }, 5000);
 
     return () => {
       isMounted = false;

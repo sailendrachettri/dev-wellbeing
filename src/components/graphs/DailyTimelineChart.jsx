@@ -23,7 +23,6 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
   const [earliestDate, setEarliestDate] = useState(null);
 
-
   const [page, setPage] = useState(0);
   const [data, setData] = useState([]);
   const { startDate, endDate, startLabel, endLabel, weekDates } =
@@ -59,7 +58,6 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     if (prevDate < earliestDate) return;
 
     if (selectedDate === startDate) {
-      // move to previous week → select Sunday
       setPage((p) => p + 1);
       setSelectedDate(prevDate);
     } else {
@@ -70,10 +68,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   const handleNext = () => {
     const nextDate = addDays(selectedDate, 1);
 
-    if (nextDate > getTodayDate()) return; // block future
+    if (nextDate > getTodayDate()) return;
 
     if (selectedDate === endDate) {
-      // move to next week → select Monday
       setPage((p) => Math.max(0, p - 1));
       setSelectedDate(clampToToday(nextDate));
     } else {
@@ -82,14 +79,12 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   };
 
   useEffect(() => {
-    // fetch earliest date from backend
     invoke("get_earliest_usage_date")
       .then((date) => setEarliestDate(date))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    // If selectedDate is outside current week, fix it
     if (selectedDate < startDate) {
       setSelectedDate(startDate);
     } else if (selectedDate > endDate) {
@@ -104,18 +99,32 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const fetchWeek = async () => {
+      try {
+        const res = await invoke("get_week_timeline_usage", {
+          startOfWeek: startDate,
+          endOfWeek: endDate,
+        });
+
+        if (isMounted) {
+          setData(res);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchWeek();
-  }, [page]);
 
-  const fetchWeek = async () => {
-    const res = await invoke("get_week_timeline_usage", {
-      startOfWeek: startDate,
-      endOfWeek: endDate,
-    });
-    console.log({ res });
+    const interval = setInterval(fetchWeek, 5000);
 
-    setData(res);
-  };
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [page, startDate, endDate]);
 
   const usageMap = Object.fromEntries(
     data.map((d) => [d.date, d.total_seconds])

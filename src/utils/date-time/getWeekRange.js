@@ -4,6 +4,14 @@ import { formatPrettyDate } from "./formatPrettyDate";
  * page = 0 → current week
  * page = 1 → previous week
  */
+
+const toYMD = (d) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export const getWeekRange = (page = 0) => {
   const today = new Date();
 
@@ -22,20 +30,19 @@ export const getWeekRange = (page = 0) => {
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
 
-  const toISO = (d) => d.toISOString().split("T")[0];
-
   const weekDates = [];
+
   for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    weekDates.push(toISO(d));
+    weekDates.push(toYMD(d));
   }
 
   return {
-    startDate: toISO(start),
-    endDate: toISO(end),
+    startDate: toYMD(start), // ✅ local
+    endDate: toYMD(end),     // ✅ local
     startLabel: formatPrettyDate(start),
     endLabel: formatPrettyDate(end),
-    weekDates, // Mon → Sun
+    weekDates,              // Mon → Sun
   };
 };

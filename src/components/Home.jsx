@@ -25,9 +25,9 @@ const Home = () => {
       } finally {
         setLoading(false);
       }
-    }, 5000); // 👈 every 5 seconds
+    }, 5000); 
 
-    // cleanup when component unmounts
+    
     return () => clearInterval(interval);
   }, []);
 

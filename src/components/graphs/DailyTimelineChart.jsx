@@ -17,6 +17,8 @@ import { getTodayDate } from "../../utils/date-time/getTodayDate";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const SELECTED_COLOR = "#42eca0";
+const FADED_COLOR = "rgba(66, 236, 160, 0.35)";
 
 const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   const [page, setPage] = useState(0);
@@ -107,8 +109,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   );
 
   const values = weekDates.map((date) => usageMap[date] ?? 0);
+
   const backgroundColors = weekDates.map((date) =>
-    date === selectedDate ? "red" : "rgba(20, 213, 149, 0.65)"
+    date === selectedDate ? SELECTED_COLOR : FADED_COLOR
   );
 
   const chartData = {
@@ -161,8 +164,8 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     },
   };
 
-  console.log('enddate ', endDate);
-  console.log('getTodayDate ', getTodayDate());
+  console.log("enddate ", endDate);
+  console.log("getTodayDate ", getTodayDate());
 
   return (
     <div className="bg-zinc-900 rounded-xl px-6 shadow-lg">

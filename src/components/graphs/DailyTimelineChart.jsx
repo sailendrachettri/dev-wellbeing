@@ -12,6 +12,7 @@ import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { getWeekRange } from "../../utils/date-time/getWeekRange";
 import { useRef } from "react";
 import { addDays } from "../../utils/date-time/addDays";
+import { getTodayDate } from "../../utils/date-time/getTodayDate";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -41,21 +42,51 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     setSelectedDate(weekDates[index]);
   };
 
+  const clampToToday = (date) => {
+    const today = getTodayDate();
+    return date > today ? today : date;
+  };
+
   const handlePrev = () => {
+    const prevDate = addDays(selectedDate, -1);
+
     if (selectedDate === startDate) {
-      setPage((p) => p + 1); // move to previous week
+      // move to previous week → select Sunday
+      setPage((p) => p + 1);
+      setSelectedDate(prevDate);
     } else {
-      setSelectedDate(addDays(selectedDate, -1)); // previous day
+      setSelectedDate(prevDate);
     }
   };
 
   const handleNext = () => {
+    const nextDate = addDays(selectedDate, 1);
+
+    if (nextDate > getTodayDate()) return; // block future
+
     if (selectedDate === endDate) {
-      setPage((p) => Math.max(0, p - 1)); // move to next week
+      // move to next week → select Monday
+      setPage((p) => Math.max(0, p - 1));
+      setSelectedDate(clampToToday(nextDate));
     } else {
-      setSelectedDate(addDays(selectedDate, 1)); // next day
+      setSelectedDate(nextDate);
     }
   };
+
+  useEffect(() => {
+    // If selectedDate is outside current week, fix it
+    if (selectedDate < startDate) {
+      setSelectedDate(startDate);
+    } else if (selectedDate > endDate) {
+      setSelectedDate(clampToToday(endDate));
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (!selectedDate) {
+      setSelectedDate(getTodayDate());
+    }
+  }, []);
 
   useEffect(() => {
     fetchWeek();
@@ -130,6 +161,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     },
   };
 
+  console.log('enddate ', endDate);
+  console.log('getTodayDate ', getTodayDate());
+
   return (
     <div className="bg-zinc-900 rounded-xl px-6 shadow-lg">
       {/* Header */}
@@ -170,12 +204,14 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
           </button>
 
           <button
-            disabled={endDate === selectedDate}
+            disabled={selectedDate >= getTodayDate()}
             onClick={() => {
               handleNext();
             }}
             className={`${
-              endDate === selectedDate ? "cursor-not-allowed" : "cursor-pointer"
+              selectedDate >= getTodayDate()
+                ? "cursor-not-allowed"
+                : "cursor-pointer"
             } px-3 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
           >
             Next →

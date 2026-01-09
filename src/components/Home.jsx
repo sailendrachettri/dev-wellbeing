@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import UsageChart from "../reusable/UsageChart";
 import { invoke } from "@tauri-apps/api/core";
 import DailyTimelineChart from "./graphs/DailyTimelineChart";
 import DailyAppUsesChart from "./graphs/DailyAppUsesChart";

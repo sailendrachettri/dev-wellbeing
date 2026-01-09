@@ -56,9 +56,6 @@ fn main() {
             get_usage_today,
             get_usage_by_date,
             get_daily_usage,
-            get_usage_weekly,
-            get_usage_monthly,
-            get_usage_yearly
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
@@ -118,21 +115,6 @@ fn save_app_usage(app_name: String, seconds: i64) {
 #[command]
 fn get_usage_today() -> Vec<db::AppUsage> {
     db::get_usage_today().unwrap_or_default()
-}
-
-#[command]
-fn get_usage_weekly() -> Vec<db::AppUsage> {
-    db::get_usage_period("week").unwrap_or_default()
-}
-
-#[command]
-fn get_usage_monthly() -> Vec<db::AppUsage> {
-    db::get_usage_period("month").unwrap_or_default()
-}
-
-#[command]
-fn get_usage_yearly() -> Vec<db::AppUsage> {
-    db::get_usage_period("year").unwrap_or_default()
 }
 
 #[command]

@@ -7,3 +7,7 @@
 - Click on the version of app you want to download
 - Now click on **View Raw** to download or click a download icon
 [All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
+
+# Screenshots
+<p><img src="https://drive.google.com/uc?export=view&id=150sHIU5hUSkLXqKag96lIe20L3ak1bTc" alt="Timeline View"></p>
+<p><img src="https://drive.google.com/uc?export=view&id=1zycnp6wpqEqqFMsnVFfDgdOzPlmHCNNi" alt="Today View"></p>

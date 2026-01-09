@@ -46,9 +46,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   }, [page]);
 
   const fetchWeek = async () => {
-    const res = await invoke("get_daily_usage", {
+    const res = await invoke("get_week_timeline_usage", {
       limit: 7,
-      offset: page * 7,
+      offset: page,
     });
 
     setData(res);
@@ -145,14 +145,13 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
                 d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
               />
             </svg>
-            <div> 
+            <div>
               <p>Weekly Usage Timeline</p>
               <p className="text-sm font-normal text-gray-400">
-            {startLabel} – {endLabel}
-          </p>
+                {startLabel} – {endLabel}
+              </p>
             </div>
           </div>
-          
         </div>
 
         <div className="flex gap-2">
@@ -166,7 +165,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
           <button
             disabled={page === 0}
             onClick={() => setPage((p) => Math.max(0, p - 1))}
-            className={`${page === 0 ? 'cursor-not-allowed' : 'cursor-pointer'} px-3 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
+            className={`${
+              page === 0 ? "cursor-not-allowed" : "cursor-pointer"
+            } px-3 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
           >
             Next →
           </button>

@@ -30,7 +30,7 @@ pub struct DailyTotalUsage {
     pub total_seconds: i64,
 }
 
-pub fn get_daily_totals(limit: i64, offset: i64) -> rusqlite::Result<Vec<DailyTotalUsage>> {
+pub fn get_week_timeline_usage(limit: i64, offset: i64) -> rusqlite::Result<Vec<DailyTotalUsage>> {
     let conn = get_db()?;
 
     let mut stmt = conn.prepare(

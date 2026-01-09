@@ -5,7 +5,7 @@ export const getWeekRange = (page = 0) => {
 
   // Move back by (page * 7) days
   const end = new Date(today);
-  end.setDate(today.getDate() - page * 7);
+  end.setDate(today.getDate() - page);
 
   const start = new Date(end);
   start.setDate(end.getDate() - 6);

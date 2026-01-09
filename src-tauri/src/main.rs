@@ -55,10 +55,7 @@ fn main() {
             save_app_usage,
             get_usage_today,
             get_usage_by_date,
-            get_daily_usage,
-            get_usage_weekly,
-            get_usage_monthly,
-            get_usage_yearly
+            get_week_timeline_usage,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
@@ -100,8 +97,12 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
 
 // daily uses with pagination just like in android digital wellbeing
 #[command]
-fn get_daily_usage(limit: i64, offset: i64) -> Vec<db::DailyTotalUsage> {
-    db::get_daily_totals(limit, offset).unwrap_or_default()
+fn get_week_timeline_usage(
+    start_of_week: String, // "YYYY-MM-DD"
+    end_of_week: String    // "YYYY-MM-DD"
+) -> Vec<db::DailyTotalUsage> {
+    db::get_week_timeline_usage(&start_of_week, &end_of_week)
+        .unwrap_or_default()
 }
 
 #[command]
@@ -118,21 +119,6 @@ fn save_app_usage(app_name: String, seconds: i64) {
 #[command]
 fn get_usage_today() -> Vec<db::AppUsage> {
     db::get_usage_today().unwrap_or_default()
-}
-
-#[command]
-fn get_usage_weekly() -> Vec<db::AppUsage> {
-    db::get_usage_period("week").unwrap_or_default()
-}
-
-#[command]
-fn get_usage_monthly() -> Vec<db::AppUsage> {
-    db::get_usage_period("month").unwrap_or_default()
-}
-
-#[command]
-fn get_usage_yearly() -> Vec<db::AppUsage> {
-    db::get_usage_period("year").unwrap_or_default()
 }
 
 #[command]

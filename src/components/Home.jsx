@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import UsageChart from "../reusable/UsageChart";
 import { invoke } from "@tauri-apps/api/core";
 import DailyTimelineChart from "./graphs/DailyTimelineChart";
 import DailyAppUsesChart from "./graphs/DailyAppUsesChart";
@@ -8,7 +7,7 @@ import { getTodayDate } from "../utils/date-time/getTodayDate";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
-  console.log({selectedDate})
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -23,6 +22,8 @@ const Home = () => {
         }
       } catch (err) {
         console.error("Usage tracking failed:", err);
+      } finally {
+        setLoading(false);
       }
     }, 5000); // 👈 every 5 seconds
 
@@ -32,15 +33,22 @@ const Home = () => {
 
   return (
     <div className="p-6 min-h-screen bg-zinc-900 text-white">
-
-      <div>
-        <DailyTimelineChart
-          setSelectedDate={setSelectedDate}
-          selectedDate={selectedDate}
-        />
-        <DailyAppUsesChart date={selectedDate} />
-      </div>
-        {/* <UsageChart /> */}
+      {loading ? (
+        <div className="min-h-screen overflow-hidden flex items-center justify-center">
+          <div className="flex items-center justify-center flex-col gap-y-2">
+            <div class="loader"></div>
+            <small className="text-slate-500">Fetching your stats... Hold tight!</small>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <DailyTimelineChart
+            setSelectedDate={setSelectedDate}
+            selectedDate={selectedDate}
+          />
+          <DailyAppUsesChart date={selectedDate} />
+        </div>
+      )}
     </div>
   );
 };

@@ -4,5 +4,7 @@
 
 
 ## Download the app for Windows
-[All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
 [View Raw or Click on Download Icon](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps/dev-wellbeing_0.1.0_x64-setup.exe)
+
+## All app versions
+[All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)

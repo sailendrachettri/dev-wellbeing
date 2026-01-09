@@ -36,7 +36,7 @@ const Home = () => {
       {loading ? (
         <div className="min-h-screen overflow-hidden flex items-center justify-center">
           <div className="flex items-center justify-center flex-col gap-y-2">
-            <div class="loader"></div>
+            <div className="loader"></div>
             <small className="text-slate-500">Fetching your stats... Hold tight!</small>
           </div>
         </div>

@@ -34,6 +34,7 @@ fn main() {
             MacosLauncher::LaunchAgent,
             None,
         ))
+        .plugin(tauri_plugin_log::Builder::default().build())
         // -------- TRAY --------
         .setup(|app| {
             let handle = app.handle();
@@ -76,7 +77,7 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     let total_seconds = get_today_total_seconds();
     let tooltip_text = format!("Today: {}", format_seconds_hm(total_seconds));
 
-    let icon = Image::from_path("icons/icon.ico")?;
+    let icon = Image::from_bytes(include_bytes!("../icons/icon.ico"))?;
 
     let app_handle = app.clone();
     let tray_icon = TrayIconBuilder::new()

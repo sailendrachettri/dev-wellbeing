@@ -4,9 +4,9 @@
 
 
 ## Download the app for Windows
-- Click on the version of app you want to download
-- Now click on **View Raw** to download or click a download icon
-[All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
+- Step 1: [All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
+- Step 2: Click on the version of app you want to download
+- Step 3: Now click on **View Raw** to download or click a download icon
 
 # Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=150sHIU5hUSkLXqKag96lIe20L3ak1bTc" alt="Timeline View"></p>

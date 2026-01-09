@@ -25,7 +25,7 @@ const Home = () => {
       } finally {
         setLoading(false);
       }
-    }, 5000); 
+    }, 10000); 
 
     
     return () => clearInterval(interval);

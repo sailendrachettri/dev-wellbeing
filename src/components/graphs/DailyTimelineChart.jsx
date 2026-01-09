@@ -118,7 +118,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
     fetchWeek();
 
-    const interval = setInterval(fetchWeek, 5000);
+    const interval = setInterval(fetchWeek, 10000);
 
     return () => {
       isMounted = false;

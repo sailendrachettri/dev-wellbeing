@@ -33,7 +33,7 @@ const DailyAppUsesChart = ({ date }) => {
           if (isMounted) setApps(data);
         })
         .catch(console.error);
-    }, 5000);
+    }, 10000);
 
     return () => {
       isMounted = false;

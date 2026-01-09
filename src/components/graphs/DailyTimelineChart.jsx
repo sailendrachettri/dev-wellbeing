@@ -16,16 +16,20 @@ import { getTodayDate } from "../../utils/date-time/getTodayDate";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const SELECTED_COLOR = "#42eca0";
-const FADED_COLOR = "rgba(66, 236, 160, 0.35)";
-
 const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
+  const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const SELECTED_COLOR = "#42eca0";
+  const FADED_COLOR = "rgba(66, 236, 160, 0.35)";
+
+  const [earliestDate, setEarliestDate] = useState(null);
+
+
   const [page, setPage] = useState(0);
   const [data, setData] = useState([]);
   const { startDate, endDate, startLabel, endLabel, weekDates } =
     getWeekRange(page);
   const chartRef = useRef(null);
+  const isPrevDisabled = earliestDate ? selectedDate <= earliestDate : true;
 
   const handleBarClick = (event) => {
     const chart = chartRef.current;
@@ -50,7 +54,9 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   };
 
   const handlePrev = () => {
+    if (!earliestDate) return;
     const prevDate = addDays(selectedDate, -1);
+    if (prevDate < earliestDate) return;
 
     if (selectedDate === startDate) {
       // move to previous week → select Sunday
@@ -74,6 +80,13 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
       setSelectedDate(nextDate);
     }
   };
+
+  useEffect(() => {
+    // fetch earliest date from backend
+    invoke("get_earliest_usage_date")
+      .then((date) => setEarliestDate(date))
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     // If selectedDate is outside current week, fix it
@@ -164,9 +177,6 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     },
   };
 
-  console.log("enddate ", endDate);
-  console.log("getTodayDate ", getTodayDate());
-
   return (
     <div className="bg-zinc-900 rounded-xl px-6 shadow-lg">
       {/* Header */}
@@ -198,10 +208,13 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
         <div className="flex gap-2">
           <button
+            disabled={isPrevDisabled}
             onClick={() => {
               handlePrev();
             }}
-            className="px-3 py-1 bg-dark rounded hover:bg-zinc-700 cursor-pointer"
+            className={`${
+              isPrevDisabled ? "cursor-not-allowed" : "cursor-pointer"
+            } px-3 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
           >
             ← Prev
           </button>

@@ -31,6 +31,12 @@ pub struct DailyTotalUsage {
     pub total_seconds: i64,
 }
 
+pub fn get_earliest_date(conn: &Connection) -> Result<String> {
+    let mut stmt = conn.prepare("SELECT MIN(date) FROM app_usage")?;
+    let earliest_date: String = stmt.query_row([], |row| row.get(0))?;
+    Ok(earliest_date)
+}
+
 pub fn get_week_timeline_usage(
     start_of_week: &str, // "YYYY-MM-DD"
     end_of_week: &str    // "YYYY-MM-DD"

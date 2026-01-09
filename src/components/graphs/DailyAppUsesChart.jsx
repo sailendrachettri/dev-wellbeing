@@ -19,9 +19,28 @@ const DailyAppUsesChart = ({ date }) => {
   useEffect(() => {
     if (!date) return;
 
+    let isMounted = true;
+
+    // fetch initial data
     invoke("get_usage_by_date", { date })
-      .then(setApps)
+      .then((data) => {
+        if (isMounted) setApps(data);
+      })
       .catch(console.error);
+
+    // update every second
+    const interval = setInterval(() => {
+      invoke("get_usage_by_date", { date })
+        .then((data) => {
+          if (isMounted) setApps(data);
+        })
+        .catch(console.error);
+    }, 5000); // every 1 second
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [date]);
 
   const totalSeconds = apps.reduce((acc, a) => acc + a.seconds, 0) || 1;
@@ -31,13 +50,13 @@ const DailyAppUsesChart = ({ date }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-bold text-white mb-1">
-            Today
-          </h3>
+          <h3 className="text-xl font-bold text-white mb-1">Today</h3>
           <p className="text-sm text-gray-400">{formatPrettyDate(date)}</p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-primary">{formatSeconds(totalSeconds)}</div>
+          <div className="text-3xl font-bold text-primary">
+            {formatSeconds(totalSeconds)}
+          </div>
           <div className="text-xs text-gray-500">total time</div>
         </div>
       </div>
@@ -79,7 +98,9 @@ const DailyAppUsesChart = ({ date }) => {
                 {/* Modern Progress Bar */}
                 <div className="relative h-2 bg-zinc-700/50 rounded-full overflow-hidden">
                   <div
-                    className={`absolute inset-y-0 left-0 bg-linear-to-r ${colors[idx % colors.length]} rounded-full transition-all duration-700 ease-out shadow-lg`}
+                    className={`absolute inset-y-0 left-0 bg-linear-to-r ${
+                      colors[idx % colors.length]
+                    } rounded-full transition-all duration-700 ease-out shadow-lg`}
                     style={{ width: `${percent}%` }}
                   >
                     <div className="absolute inset-0 bg-white/20 animate-pulse"></div>

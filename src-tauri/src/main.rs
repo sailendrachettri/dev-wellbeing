@@ -2,9 +2,13 @@
 
 mod db;
 use chrono::Local;
+use std::sync::Arc;
+use std::time::Duration;
+use tauri::async_runtime;
+use rusqlite::Connection;
 use tauri::{
-    image::Image,
     command,
+    image::Image,
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, WindowEvent,
@@ -23,6 +27,7 @@ use windows::{
 
 fn main() {
     //  db::populate_dummy_data();
+
     tauri::Builder::default()
         // -------- AUTOSTART --------
         .plugin(tauri_plugin_autostart::init(
@@ -57,6 +62,7 @@ fn main() {
             get_usage_today,
             get_usage_by_date,
             get_week_timeline_usage,
+            get_earliest_usage_date
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
@@ -70,29 +76,26 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     let total_seconds = get_today_total_seconds();
     let tooltip_text = format!("Today: {}", format_seconds_hm(total_seconds));
 
-    // Load icon - use Image::from_path for Tauri v2
     let icon = Image::from_path("icons/icon.ico")?;
-    
+
     let app_handle = app.clone();
-    TrayIconBuilder::new()
+    let tray_icon = TrayIconBuilder::new()
         .icon(icon)
         .tooltip(&tooltip_text)
         .menu(&menu)
-        .on_menu_event(move |app, event| {
-            match event.id.as_ref() {
-                "open" => {
-                    if let Some(win) = app.get_webview_window("main") {
-                        let _ = win.show();
-                        let _ = win.set_focus();
-                    }
+        .on_menu_event(move |app, event| match event.id.as_ref() {
+            "open" => {
+                if let Some(win) = app.get_webview_window("main") {
+                    let _ = win.show();
+                    let _ = win.set_focus();
                 }
-                "quit" => {
-                    app.exit(0);
-                }
-                _ => {}
             }
+            "quit" => {
+                app.exit(0);
+            }
+            _ => {}
         })
-        .on_tray_icon_event(move |tray, event| {
+        .on_tray_icon_event(move |_tray, event| {
             if let TrayIconEvent::DoubleClick { .. } = event {
                 if let Some(win) = app_handle.get_webview_window("main") {
                     let _ = win.show();
@@ -102,7 +105,37 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         })
         .build(app)?;
 
+    // Start background task to update tooltip every minute
+    // let app_clone = app.clone();
+    let tray_clone = Arc::new(tray_icon);
+    async_runtime::spawn(async move {
+        loop {
+            async_runtime::spawn_blocking(|| {
+                std::thread::sleep(Duration::from_secs(60));
+            })
+            .await
+            .ok();
+
+            let total_seconds = get_today_total_seconds();
+            let tooltip_text = format!("Today: {}", format_seconds_hm(total_seconds));
+            let _ = tray_clone.set_tooltip(Some(&tooltip_text));
+        }
+    });
+
     Ok(())
+}
+
+
+#[command]
+fn get_earliest_usage_date() -> Result<String, String> {
+    let mut path = dirs::data_dir().ok_or("No data dir")?;
+    path.push("dev-wellbeing");
+    std::fs::create_dir_all(&path).ok();
+    path.push("usage.db");
+
+    let conn = Connection::open(path).map_err(|e| e.to_string())?;
+
+    db::get_earliest_date(&conn).map_err(|e| e.to_string())
 }
 
 #[command]

@@ -11,15 +11,17 @@ import {
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { getWeekRange } from "../../utils/date-time/getWeekRange";
 import { useRef } from "react";
+import { addDays } from "../../utils/date-time/addDays";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
+  const [page, setPage] = useState(0);
   const [data, setData] = useState([]);
-  const [page, setPage] = useState(0); // pagination (week index)
-  const { startLabel, endLabel } = getWeekRange(page);
+  const { startDate, endDate, startLabel, endLabel, weekDates } =
+    getWeekRange(page);
   const chartRef = useRef(null);
 
   const handleBarClick = (event) => {
@@ -36,9 +38,23 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
     if (!elements.length) return;
 
     const index = elements[0].index;
-    const selectedDate = [...data].reverse()[index].date;
+    setSelectedDate(weekDates[index]);
+  };
 
-    setSelectedDate(selectedDate);
+  const handlePrev = () => {
+    if (selectedDate === startDate) {
+      setPage((p) => p + 1); // move to previous week
+    } else {
+      setSelectedDate(addDays(selectedDate, -1)); // previous day
+    }
+  };
+
+  const handleNext = () => {
+    if (selectedDate === endDate) {
+      setPage((p) => Math.max(0, p - 1)); // move to next week
+    } else {
+      setSelectedDate(addDays(selectedDate, 1)); // next day
+    }
   };
 
   useEffect(() => {
@@ -47,40 +63,29 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
   const fetchWeek = async () => {
     const res = await invoke("get_week_timeline_usage", {
-      limit: 7,
-      offset: page,
+      startOfWeek: startDate,
+      endOfWeek: endDate,
     });
+    console.log({ res });
 
     setData(res);
   };
 
-  // Ensure exactly 7 bars (fill missing days with 0)
-  const labels = [...data]
-    .reverse()
-    .map((d) =>
-      new Date(d.date).toLocaleDateString("en-US", { weekday: "short" })
-    );
+  const usageMap = Object.fromEntries(
+    data.map((d) => [d.date, d.total_seconds])
+  );
 
-  const values = [...data].reverse().map((d) => d.total_seconds);
-  const reversedData = [...data].reverse();
-
-  const backgroundColors = reversedData.map(
-    (d) =>
-      d.date === selectedDate
-        ? "red" // highlighted bar
-        : "rgba(20, 213, 149, 0.65)" // faded bars
+  const values = weekDates.map((date) => usageMap[date] ?? 0);
+  const backgroundColors = weekDates.map((date) =>
+    date === selectedDate ? "red" : "rgba(20, 213, 149, 0.65)"
   );
 
   const chartData = {
-    labels,
+    labels: DAYS,
     datasets: [
       {
-        label: "Usage Time",
         data: values,
         backgroundColor: backgroundColors,
-        borderColor: reversedData.map((d) =>
-          d.date === selectedDate ? "#ffffff" : "transparent"
-        ),
         borderRadius: 6,
         barThickness: 28,
       },
@@ -156,17 +161,21 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
         <div className="flex gap-2">
           <button
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => {
+              handlePrev();
+            }}
             className="px-3 py-1 bg-dark rounded hover:bg-zinc-700 cursor-pointer"
           >
             ← Prev
           </button>
 
           <button
-            disabled={page === 0}
-            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={endDate === selectedDate}
+            onClick={() => {
+              handleNext();
+            }}
             className={`${
-              page === 0 ? "cursor-not-allowed" : "cursor-pointer"
+              endDate === selectedDate ? "cursor-not-allowed" : "cursor-pointer"
             } px-3 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
           >
             Next →

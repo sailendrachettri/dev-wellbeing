@@ -97,8 +97,12 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
 
 // daily uses with pagination just like in android digital wellbeing
 #[command]
-fn get_week_timeline_usage(limit: i64, offset: i64) -> Vec<db::DailyTotalUsage> {
-    db::get_week_timeline_usage(limit, offset).unwrap_or_default()
+fn get_week_timeline_usage(
+    start_of_week: String, // "YYYY-MM-DD"
+    end_of_week: String    // "YYYY-MM-DD"
+) -> Vec<db::DailyTotalUsage> {
+    db::get_week_timeline_usage(&start_of_week, &end_of_week)
+        .unwrap_or_default()
 }
 
 #[command]

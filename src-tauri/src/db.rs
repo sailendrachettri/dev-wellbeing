@@ -24,31 +24,38 @@ fn get_db() -> Result<Connection> {
 }
 
 
+
 #[derive(serde::Serialize)]
 pub struct DailyTotalUsage {
     pub date: String,      // "2026-01-07"
     pub total_seconds: i64,
 }
 
-pub fn get_week_timeline_usage(limit: i64, offset: i64) -> rusqlite::Result<Vec<DailyTotalUsage>> {
+pub fn get_week_timeline_usage(
+    start_of_week: &str, // "YYYY-MM-DD"
+    end_of_week: &str    // "YYYY-MM-DD"
+) -> rusqlite::Result<Vec<DailyTotalUsage>> {
     let conn = get_db()?;
 
     let mut stmt = conn.prepare(
         "
-        SELECT date, SUM(usage_seconds) as total_seconds
+        SELECT date, SUM(usage_seconds) AS total_seconds
         FROM app_usage
+        WHERE date BETWEEN ?1 AND ?2
         GROUP BY date
-        ORDER BY date DESC
-        LIMIT ? OFFSET ?
+        ORDER BY date ASC
         "
     )?;
 
-    let rows = stmt.query_map([limit, offset], |row| {
-        Ok(DailyTotalUsage {
-            date: row.get(0)?,
-            total_seconds: row.get(1)?,
-        })
-    })?;
+    let rows = stmt.query_map(
+        params![start_of_week, end_of_week],
+        |row| {
+            Ok(DailyTotalUsage {
+                date: row.get(0)?,
+                total_seconds: row.get(1)?,
+            })
+        },
+    )?;
 
     let mut result = Vec::new();
     for row in rows {
@@ -57,6 +64,7 @@ pub fn get_week_timeline_usage(limit: i64, offset: i64) -> rusqlite::Result<Vec<
 
     Ok(result)
 }
+
 
 pub fn get_usage_by_date(date: &str) -> Result<Vec<AppUsage>> {
     let conn = get_db()?;

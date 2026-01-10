@@ -2,10 +2,10 @@
 
 mod db;
 use chrono::Local;
-use std::sync::Arc;
+use rusqlite::Connection;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tauri::async_runtime;
-use rusqlite::Connection;
 use tauri::{
     command,
     image::Image,
@@ -13,7 +13,6 @@ use tauri::{
     tray::{TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, WindowEvent,
 };
-use tauri_plugin_autostart::MacosLauncher;
 
 use windows::{
     core::PWSTR,
@@ -25,25 +24,43 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
-fn main() {
-    //  db::populate_dummy_data();
+// Track the current active app
+struct ActiveAppState {
+    current_app: Arc<Mutex<Option<String>>>,
+    start_time: Arc<Mutex<std::time::Instant>>,
+}
 
+fn main() {
     tauri::Builder::default()
         // -------- AUTOSTART --------
         .plugin(tauri_plugin_autostart::init(
-            MacosLauncher::LaunchAgent,
-            None,
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec!["--minimized"]),
         ))
         .plugin(tauri_plugin_log::Builder::default().build())
+        // -------- STATE --------
+        .manage(ActiveAppState {
+            current_app: Arc::new(Mutex::new(None)),
+            start_time: Arc::new(Mutex::new(std::time::Instant::now())),
+        })
         // -------- TRAY --------
         .setup(|app| {
             let handle = app.handle();
             setup_tray(&handle)?;
 
-            if let Some(win) = app.get_webview_window("main") {
-                win.show()?;
-                win.set_focus()?;
+            // Check if launched with --minimized flag
+            let args: Vec<String> = std::env::args().collect();
+            let minimized = args.contains(&"--minimized".to_string());
+
+            if !minimized {
+                if let Some(win) = app.get_webview_window("main") {
+                    win.show()?;
+                    win.set_focus()?;
+                }
             }
+
+            // Start background tracking immediately
+            start_background_tracking(app.handle().clone());
 
             Ok(())
         })
@@ -63,10 +80,59 @@ fn main() {
             get_usage_today,
             get_usage_by_date,
             get_week_timeline_usage,
-            get_earliest_usage_date
+            get_earliest_usage_date,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
+}
+
+fn start_background_tracking(app: AppHandle) {
+    let state = app.state::<ActiveAppState>();
+    let current_app = state.current_app.clone();
+    let start_time = state.start_time.clone();
+
+    async_runtime::spawn(async move {
+        loop {
+            // Check active app every 5 seconds
+            async_runtime::spawn_blocking(|| {
+                std::thread::sleep(Duration::from_secs(5));
+            })
+            .await
+            .ok();
+
+            let active_app = get_active_app();
+
+            let mut current = current_app.lock().unwrap();
+            let mut start = start_time.lock().unwrap();
+
+            if let Some(app_name) = &active_app {
+                if current.as_ref() != Some(app_name) {
+                    // App changed - save previous app's usage
+                    if let Some(prev_app) = current.as_ref() {
+                        let elapsed = start.elapsed().as_secs() as i64;
+                        if elapsed > 0 {
+                            let today = Local::now().format("%Y-%m-%d").to_string();
+                            db::add_usage(prev_app, &today, elapsed);
+                        }
+                    }
+
+                    // Update to new app
+                    *current = Some(app_name.clone());
+                    *start = std::time::Instant::now();
+                }
+            } else if current.is_some() {
+                // No active window - save current app's usage
+                if let Some(prev_app) = current.take() {
+                    let elapsed = start.elapsed().as_secs() as i64;
+                    if elapsed > 0 {
+                        let today = Local::now().format("%Y-%m-%d").to_string();
+                        db::add_usage(&prev_app, &today, elapsed);
+                    }
+                }
+                *start = std::time::Instant::now();
+            }
+        }
+    });
 }
 
 fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
@@ -92,6 +158,19 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
                 }
             }
             "quit" => {
+                // Save current session before quitting
+                let state = app.state::<ActiveAppState>();
+                let current = state.current_app.lock().unwrap();
+                let start = state.start_time.lock().unwrap();
+                
+                if let Some(app_name) = current.as_ref() {
+                    let elapsed = start.elapsed().as_secs() as i64;
+                    if elapsed > 0 {
+                        let today = Local::now().format("%Y-%m-%d").to_string();
+                        db::add_usage(app_name, &today, elapsed);
+                    }
+                }
+                
                 app.exit(0);
             }
             _ => {}
@@ -107,7 +186,6 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         .build(app)?;
 
     // Start background task to update tooltip every minute
-    // let app_clone = app.clone();
     let tray_clone = Arc::new(tray_icon);
     async_runtime::spawn(async move {
         loop {
@@ -125,7 +203,6 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
 
     Ok(())
 }
-
 
 #[command]
 fn get_earliest_usage_date() -> Result<String, String> {
@@ -151,11 +228,10 @@ fn format_seconds_hm(seconds: i64) -> String {
     format!("{}h {}m", hours, minutes)
 }
 
-// daily uses with pagination just like in android digital wellbeing
 #[command]
 fn get_week_timeline_usage(
-    start_of_week: String, // "YYYY-MM-DD"
-    end_of_week: String,   // "YYYY-MM-DD"
+    start_of_week: String,
+    end_of_week: String,
 ) -> Vec<db::DailyTotalUsage> {
     db::get_week_timeline_usage(&start_of_week, &end_of_week).unwrap_or_default()
 }

@@ -25,3 +25,20 @@ html{
 @keyframes l6 {
     100% {inset:0}
 }
+
+
+/* --------------------------------For th auto restart prompt-------------------------------- */
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.25s ease-out;
+}

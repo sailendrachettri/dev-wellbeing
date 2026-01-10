@@ -1,7 +1,7 @@
 {
   "name": "dev-wellbeing",
   "private": true,
-  "version": "1.2.3",
+  "version": "1.2.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,8 @@
     "chart.js": "^4.5.1",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

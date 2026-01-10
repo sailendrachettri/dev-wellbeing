@@ -8,6 +8,9 @@
 - Step 2: Click on the version of app you want to download
 - Step 3: Now click on **View Raw** to download or click a download icon
 
-# Screenshots
+## Screenshots
 <p><img src="https://drive.google.com/uc?export=view&id=150sHIU5hUSkLXqKag96lIe20L3ak1bTc" alt="Timeline View"></p>
 <p><img src="https://drive.google.com/uc?export=view&id=1zycnp6wpqEqqFMsnVFfDgdOzPlmHCNNi" alt="Today View"></p>
+
+## Features to be added
+- App specific icon 

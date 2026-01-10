@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "dev-wellbeing",
+  "productName": "Dev Wellbeing",
   "version": "1.1.2",
   "identifier": "com.dev.wellbeing",
   "build": {

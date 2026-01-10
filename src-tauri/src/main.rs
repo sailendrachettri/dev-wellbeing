@@ -52,8 +52,11 @@ fn main() {
             let args: Vec<String> = std::env::args().collect();
             let minimized = args.contains(&"--minimized".to_string());
 
-            if !minimized {
-                if let Some(win) = app.get_webview_window("main") {
+            if let Some(win) = app.get_webview_window("main") {
+                if minimized {
+                    // IMPORTANT: hide window immediately
+                    win.hide()?;
+                } else {
                     win.show()?;
                     win.set_focus()?;
                 }
@@ -162,7 +165,7 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
                 let state = app.state::<ActiveAppState>();
                 let current = state.current_app.lock().unwrap();
                 let start = state.start_time.lock().unwrap();
-                
+
                 if let Some(app_name) = current.as_ref() {
                     let elapsed = start.elapsed().as_secs() as i64;
                     if elapsed > 0 {
@@ -170,7 +173,7 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
                         db::add_usage(app_name, &today, elapsed);
                     }
                 }
-                
+
                 app.exit(0);
             }
             _ => {}
@@ -229,10 +232,7 @@ fn format_seconds_hm(seconds: i64) -> String {
 }
 
 #[command]
-fn get_week_timeline_usage(
-    start_of_week: String,
-    end_of_week: String,
-) -> Vec<db::DailyTotalUsage> {
+fn get_week_timeline_usage(start_of_week: String, end_of_week: String) -> Vec<db::DailyTotalUsage> {
     db::get_week_timeline_usage(&start_of_week, &end_of_week).unwrap_or_default()
 }
 

@@ -1,29 +1,43 @@
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, 0.5) transparent;
+}
+
+
 html{
     background-color: #18181b;
+    
 }
 
 
 /* -------------------------------Css loader------------------------------- */
 /* HTML: <div className="loader"></div> */
+/* HTML: <div class="loader"></div> */
 .loader {
-  width: 120px;
-  height: 22px;
-  border-radius: 20px;
-  color: #95cdc4;
-  border: 2px solid;
+  height: 60px;
+  aspect-ratio: 2;
+  border-bottom: 3px solid #0000;
+  background: 
+    linear-gradient(90deg,#524656 50%,#0000 0)
+    -25% 100%/50% 3px repeat-x border-box;
   position: relative;
+  animation: l3-0 .75s linear infinite;
 }
-.loader::before {
+.loader:before {
   content: "";
   position: absolute;
-  margin: 2px;
-  inset: 0 100% 0 0;
-  border-radius: inherit;
-  background: currentColor;
-  animation: l6 2s infinite;
+  inset: auto 42.5% 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #42eca0;
+  animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
 }
-@keyframes l6 {
-    100% {inset:0}
+@keyframes l3-0 {
+  to {background-position: -125% 100%}
+}
+@keyframes l3-1 {
+  0%,2% {bottom: 0%}
+  98%,to {bottom:.1%}
 }
 
 
@@ -41,4 +55,37 @@ html{
 
 .animate-slide-in {
   animation: slide-in 0.25s ease-out;
+}
+
+
+/* --------------------------------------custom scrollbar-------------------------------------- */
+/* Width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Thumb */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 116, 139, 0.4); /* slate */
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.7);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.4);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.7);
 }

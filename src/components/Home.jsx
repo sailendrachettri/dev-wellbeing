@@ -37,7 +37,7 @@ const Home = () => {
         <div className="min-h-screen overflow-hidden flex items-center justify-center">
           <div className="flex items-center justify-center flex-col gap-y-2">
             <div className="loader"></div>
-            <small className="text-slate-500">Fetching your stats... Hold tight!</small>
+            <small className="text-slate-500 italic">Getting your stats… just a moment!</small>
           </div>
         </div>
       ) : (

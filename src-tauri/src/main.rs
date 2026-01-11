@@ -9,7 +9,7 @@ use tauri::async_runtime;
 use tauri::{
     command,
     image::Image,
-    menu::{Menu, MenuItem, PredefinedMenuItem},
+    menu::{Menu, MenuItem},
     tray::{TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, WindowEvent,
 };
@@ -180,9 +180,8 @@ fn start_background_tracking(app: AppHandle) {
 }
 
 fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
-    let open = MenuItem::with_id(app, "open", "Open App", true, Option::<&str>::None)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, Option::<&str>::None)?;
-    let menu = Menu::with_items(app, &[&open, &PredefinedMenuItem::separator(app)?, &quit])?;
+    let menu = Menu::with_items(app, &[ &quit])?;
 
     let total_seconds = get_today_total_seconds();
     let tooltip_text = format!("Today: {}", format_seconds_hm(total_seconds));

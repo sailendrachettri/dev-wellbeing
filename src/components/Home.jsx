@@ -4,10 +4,14 @@ import DailyTimelineChart from "./graphs/DailyTimelineChart";
 import DailyAppUsesChart from "./graphs/DailyAppUsesChart";
 import { useState } from "react";
 import { getTodayDate } from "../utils/date-time/getTodayDate";
+import { formatSeconds } from "../utils/date-time/formatSeconds";
+import { formatPrettyDate } from "../utils/date-time/formatPrettyDate";
+import { formatDateShort } from "../utils/date-time/formatDateShort";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [loading, setLoading] = useState(true);
+  const [totalSecondsSpent, setTotalSecondsSpent] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -25,9 +29,8 @@ const Home = () => {
       } finally {
         setLoading(false);
       }
-    }, 10000); 
+    }, 10000);
 
-    
     return () => clearInterval(interval);
   }, []);
 
@@ -37,16 +40,32 @@ const Home = () => {
         <div className="min-h-screen overflow-hidden flex items-center justify-center">
           <div className="flex items-center justify-center flex-col gap-y-2">
             <div className="loader"></div>
-            <small className="text-slate-500 italic">Getting your stats… just a moment!</small>
+            <small className="text-slate-500 italic">
+              Getting your stats… just a moment!
+            </small>
           </div>
         </div>
       ) : (
         <div className="min-h-screen bg-zinc-900 text-white py-5">
+          <div className="flex items-center flex-col justify-center mb-6">
+            <div className="text-4xl font-bold text-primary">
+              {formatSeconds(totalSecondsSpent)}
+            </div>
+            <div className="text-xs text-gray-500">
+              {selectedDate == getTodayDate()
+                ? "Today"
+                : formatDateShort(selectedDate)}
+            </div>
+          </div>
+
           <DailyTimelineChart
             setSelectedDate={setSelectedDate}
             selectedDate={selectedDate}
           />
-          <DailyAppUsesChart date={selectedDate} />
+          <DailyAppUsesChart
+            date={selectedDate}
+            setTotalSecondsSpent={setTotalSecondsSpent}
+          />
         </div>
       )}
     </>

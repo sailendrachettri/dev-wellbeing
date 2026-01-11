@@ -13,7 +13,8 @@ export function formatSeconds(seconds) {
   const remainingMins = mins % 60;
 
   if (hours < 24) {
-    return `${hours}h ${remainingMins}m ${sec}s`;
+    // return `${hours}h ${remainingMins}m ${sec}s`;
+    return `${hours}hr ${remainingMins}min`;
   }
 
   const days = Math.floor(hours / 24);

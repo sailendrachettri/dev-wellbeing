@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
-import { sendNotification } from "@tauri-apps/plugin-notification";
+import { showNotification } from "../../utils/notifications/notificationMessages";
 
 const DEFAULT_TIME = 25 * 60; // 25 minutes in seconds
 
@@ -48,12 +48,7 @@ const Pomodoro = () => {
     notifiedRef.current = false;
   };
 
-  const showNotification = () => {
-    sendNotification({
-      title: "Pomodoro Completed 🎉",
-      body: "Great job! Time to take a break.",
-    });
-  };
+ 
 
   // Format time mm:ss
   const formatTime = (seconds) => {

@@ -15,5 +15,4 @@
 ## Features to be added
 - App specific icon 
 - Note taking
-- Pomodor 
 - App Lock

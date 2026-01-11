@@ -163,6 +163,11 @@ const Pomodoro = () => {
                 max="120"
                 value={customMinutes}
                 onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    applyCustomTime();
+                  }
+                }}
                 className="w-10 text-center text-xs font-semibold bg-transparent outline-none
                  [appearance:textfield]
                  [&::-webkit-outer-spin-button]:appearance-none

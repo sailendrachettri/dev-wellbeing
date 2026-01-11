@@ -1,4 +1,3 @@
-
 use rusqlite::{params, Connection, Result};
 use std::path::PathBuf;
 
@@ -23,13 +22,93 @@ fn get_db() -> Result<Connection> {
     Ok(conn)
 }
 
-
-
 #[derive(serde::Serialize)]
 pub struct DailyTotalUsage {
-    pub date: String,      // "2026-01-07"
+    pub date: String, // "2026-01-07"
     pub total_seconds: i64,
 }
+
+// pub fn delete_system_apps(conn: &Connection) -> Result<()> {
+//     let system_keywords = [
+//         "explorer",
+//         "searchhost",
+//         "startmenuexperiencehost",
+//         "shellexperiencehost",
+//         "applicationframehost",
+//         "runtimebroker",
+//         "systemsettings",
+//         "taskmgr",
+//         "smartscreen",
+//         "ctfmon",
+//         "lockapp",
+//         "winlogon",
+//         "explorer.exe",
+//         "WindowsTerminal.exe",
+//         "Msedgewebview2",
+//         "msedgewebview2.exe",
+//         "msedgewebview2",
+//         "dwm",
+//         "app",
+//         "app.exe",
+//         "App.exe",
+//         "App",
+//         "code.exe",
+//         "code",
+//         "msedge",
+//         "lock app", 
+//          "WindowsTerminal.exe",
+//         "explorer",
+//         "shellexperiencehost",
+//         "applicationframehost",
+//         "searchhost",
+//         "startmenuexperiencehost",
+//         "systemsettings",
+//         "lockapp",
+//         "lock app",
+//         "runtimebroker",
+//         "smartscreen",
+//         "ctfmon",
+//         "winlogon",
+//         "dwm",
+//         "taskmgr",
+//         "msedgewebview2",
+//         "webview2",
+//         "edgewebview",
+//         "svchost",
+//         "services",
+//         "conhost",
+//         "dllhost",
+//         "fontdrvhost",
+//         "csrss",
+//         "lsass",
+//         "Code.exe",
+//         "Code",
+//         "code",
+//         "code.exe",
+//         "windowsterminal",
+//         "powershell",
+//         "pwsh",
+//         "cmd",
+//         "\\windows\\system32",
+//         "\\windowsapps\\",
+//         "\\program files\\windowsapps",
+//         "app.exe",
+//         "app",
+//         "dev-wellbeing",
+//     ];
+
+//     let mut stmt = conn.prepare(
+//         "DELETE FROM app_usage
+//          WHERE LOWER(app_name) LIKE '%' || ?1 || '%'"
+//     )?;
+
+//     for keyword in system_keywords {
+//         stmt.execute([keyword])?;
+//     }
+
+//     Ok(())
+// }
+
 
 pub fn get_earliest_date(conn: &Connection) -> Result<String> {
     let mut stmt = conn.prepare("SELECT MIN(date) FROM app_usage")?;
@@ -39,7 +118,7 @@ pub fn get_earliest_date(conn: &Connection) -> Result<String> {
 
 pub fn get_week_timeline_usage(
     start_of_week: &str, // "YYYY-MM-DD"
-    end_of_week: &str    // "YYYY-MM-DD"
+    end_of_week: &str,   // "YYYY-MM-DD"
 ) -> rusqlite::Result<Vec<DailyTotalUsage>> {
     let conn = get_db()?;
 
@@ -50,18 +129,15 @@ pub fn get_week_timeline_usage(
         WHERE date BETWEEN ?1 AND ?2
         GROUP BY date
         ORDER BY date ASC
-        "
+        ",
     )?;
 
-    let rows = stmt.query_map(
-        params![start_of_week, end_of_week],
-        |row| {
-            Ok(DailyTotalUsage {
-                date: row.get(0)?,
-                total_seconds: row.get(1)?,
-            })
-        },
-    )?;
+    let rows = stmt.query_map(params![start_of_week, end_of_week], |row| {
+        Ok(DailyTotalUsage {
+            date: row.get(0)?,
+            total_seconds: row.get(1)?,
+        })
+    })?;
 
     let mut result = Vec::new();
     for row in rows {
@@ -70,7 +146,6 @@ pub fn get_week_timeline_usage(
 
     Ok(result)
 }
-
 
 pub fn get_usage_by_date(date: &str) -> Result<Vec<AppUsage>> {
     let conn = get_db()?;
@@ -97,10 +172,8 @@ pub fn get_usage_by_date(date: &str) -> Result<Vec<AppUsage>> {
     Ok(result)
 }
 
-
 pub fn add_usage(app_name: &str, date: &str, seconds: i64) {
     let conn = get_db().unwrap();
-
 
     let updated = conn
         .execute(
@@ -126,7 +199,6 @@ pub struct AppUsage {
     pub app: String,
     pub seconds: i64,
 }
-
 
 pub fn get_usage_today() -> Result<Vec<AppUsage>> {
     let conn = get_db()?;

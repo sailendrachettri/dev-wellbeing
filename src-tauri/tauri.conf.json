@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Dev Wellbeing",
+        "title": "Dev Wellbeing (Beta)",
         "width": 800,
         "height": 600,
         "resizable": true,

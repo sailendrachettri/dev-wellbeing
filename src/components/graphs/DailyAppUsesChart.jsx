@@ -16,6 +16,8 @@ const colors = [
 const DailyAppUsesChart = ({ date }) => {
   const [apps, setApps] = useState([]);
 
+  console.log({apps})
+
   useEffect(() => {
     if (!date) return;
 
@@ -67,28 +69,28 @@ const DailyAppUsesChart = ({ date }) => {
       ) : (
         <div className="space-y-4">
           {apps?.map((app, idx) => {
-            const percent = Math.round((app.seconds / totalSeconds) * 100);
+            const percent = Math.round((app?.seconds / totalSeconds) * 100);
 
             return (
               <div
-                key={app.app}
+                key={app?.app}
                 className="bg-dark/50 backdrop-blur rounded-xl p-4 hover:bg-dark/70 transition-all duration-300 border border-zinc-700/50"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">{getAppIcon(app.app)}</div>
+                    <div className="text-2xl">{getAppIcon(app?.app)}</div>
                     <div>
                       <div className="font-semibold text-white">
-                        {formatAppName(app.app)}
+                        {formatAppName(app?.app)}
                       </div>
                       <div className="text-xs text-gray-400">
-                        {formatSeconds(app.seconds)} • {percent}% of total
+                        {formatSeconds(app?.seconds)} • {percent}% of total
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold text-primary">
-                      {formatSeconds(app.seconds)}
+                      {formatSeconds(app?.seconds)}
                     </div>
                   </div>
                 </div>

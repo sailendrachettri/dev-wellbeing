@@ -24,7 +24,6 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
-// Track the current active app
 struct ActiveAppState {
     current_app: Arc<Mutex<Option<String>>>,
     start_time: Arc<Mutex<std::time::Instant>>,
@@ -32,29 +31,30 @@ struct ActiveAppState {
 
 fn main() {
     tauri::Builder::default()
-        // -------- AUTOSTART --------
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
         ))
         .plugin(tauri_plugin_log::Builder::default().build())
-        // -------- STATE --------
         .manage(ActiveAppState {
             current_app: Arc::new(Mutex::new(None)),
             start_time: Arc::new(Mutex::new(std::time::Instant::now())),
         })
-        // -------- TRAY --------
         .setup(|app| {
             let handle = app.handle();
             setup_tray(&handle)?;
 
-            // Check if launched with --minimized flag
+            // Cleanup  the unnecessary code
+            // if let Err(e) = cleanup_invalid_usage_data() {
+            //     eprintln!("Cleanup failed: {}", e);
+            // }
+            
+
             let args: Vec<String> = std::env::args().collect();
             let minimized = args.contains(&"--minimized".to_string());
 
             if let Some(win) = app.get_webview_window("main") {
                 if minimized {
-                    // IMPORTANT: hide window immediately
                     win.hide()?;
                 } else {
                     win.show()?;
@@ -62,12 +62,10 @@ fn main() {
                 }
             }
 
-            // Start background tracking immediately
             start_background_tracking(app.handle().clone());
 
             Ok(())
         })
-        // -------- HIDE ON CLOSE --------
         .on_window_event(|app, event| {
             if let WindowEvent::CloseRequested { api, .. } = event {
                 if let Some(win) = app.get_webview_window("main") {
@@ -76,7 +74,6 @@ fn main() {
                 api.prevent_close();
             }
         })
-        // ---------------- Commands ----------------
         .invoke_handler(tauri::generate_handler![
             get_active_app,
             save_app_usage,
@@ -89,6 +86,48 @@ fn main() {
         .expect("error while running tauri app");
 }
 
+fn is_system_app(app_name: &str) -> bool {
+    let app = app_name.to_lowercase();
+
+    let system_apps = [
+        "WindowsTerminal.exe",
+        "explorer",
+        "shellexperiencehost",
+        "applicationframehost",
+        "searchhost",
+        "startmenuexperiencehost",
+        "systemsettings",
+        "lockapp",
+        "lock app",
+        "runtimebroker",
+        "smartscreen",
+        "ctfmon",
+        "winlogon",
+        "dwm",
+        "taskmgr",
+        "msedgewebview2",
+        "webview2",
+        "edgewebview",
+        "svchost",
+        "services",
+        "conhost",
+        "dllhost",
+        "fontdrvhost",
+        "csrss",
+        "lsass",
+        "windowsterminal",
+        "powershell",
+        "pwsh",
+        "cmd",
+        "\\windows\\system32",
+        "\\windowsapps\\",
+        "\\program files\\windowsapps"
+    ];
+
+    system_apps.iter().any(|k| app.contains(k))
+}
+
+
 fn start_background_tracking(app: AppHandle) {
     let state = app.state::<ActiveAppState>();
     let current_app = state.current_app.clone();
@@ -96,21 +135,25 @@ fn start_background_tracking(app: AppHandle) {
 
     async_runtime::spawn(async move {
         loop {
-            // Check active app every 5 seconds
             async_runtime::spawn_blocking(|| {
                 std::thread::sleep(Duration::from_secs(5));
             })
             .await
             .ok();
 
-            let active_app = get_active_app();
+            let mut active_app = get_active_app();
+            /* println!("active app1: {:?}", active_app); */
+            active_app = active_app
+            .filter(|app| !is_system_app(app));
+
+        /* println!("active app2: {:?}", active_app); */
+
 
             let mut current = current_app.lock().unwrap();
             let mut start = start_time.lock().unwrap();
 
             if let Some(app_name) = &active_app {
                 if current.as_ref() != Some(app_name) {
-                    // App changed - save previous app's usage
                     if let Some(prev_app) = current.as_ref() {
                         let elapsed = start.elapsed().as_secs() as i64;
                         if elapsed > 0 {
@@ -119,12 +162,10 @@ fn start_background_tracking(app: AppHandle) {
                         }
                     }
 
-                    // Update to new app
                     *current = Some(app_name.clone());
                     *start = std::time::Instant::now();
                 }
             } else if current.is_some() {
-                // No active window - save current app's usage
                 if let Some(prev_app) = current.take() {
                     let elapsed = start.elapsed().as_secs() as i64;
                     if elapsed > 0 {
@@ -154,14 +195,7 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         .tooltip(&tooltip_text)
         .menu(&menu)
         .on_menu_event(move |app, event| match event.id.as_ref() {
-            "open" => {
-                if let Some(win) = app.get_webview_window("main") {
-                    let _ = win.show();
-                    let _ = win.set_focus();
-                }
-            }
             "quit" => {
-                // Save current session before quitting
                 let state = app.state::<ActiveAppState>();
                 let current = state.current_app.lock().unwrap();
                 let start = state.start_time.lock().unwrap();
@@ -188,7 +222,6 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         })
         .build(app)?;
 
-    // Start background task to update tooltip every minute
     let tray_clone = Arc::new(tray_icon);
     async_runtime::spawn(async move {
         loop {
@@ -205,6 +238,31 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     });
 
     Ok(())
+}
+
+// fn cleanup_invalid_usage_data() -> Result<(), String> {
+//     let mut path = dirs::data_dir().ok_or("No data dir")?;
+//     path.push("dev-wellbeing");
+//     path.push("usage.db");
+
+//     let conn = Connection::open(path).map_err(|e| e.to_string())?;
+
+//     // 1. Remove system apps
+//     db::delete_system_apps(&conn).map_err(|e| e.to_string())?;
+//     Ok(())
+// }
+
+
+
+#[command]
+fn save_app_usage(app_name: String, seconds: i64) {
+    if is_system_app(&app_name) {
+        return;
+    }
+
+    let today = Local::now().format("%Y-%m-%d").to_string();
+
+    db::add_usage(&app_name, &today, seconds);
 }
 
 #[command]
@@ -241,11 +299,8 @@ fn get_usage_by_date(date: String) -> Vec<db::AppUsage> {
     db::get_usage_by_date(&date).unwrap_or_default()
 }
 
-#[command]
-fn save_app_usage(app_name: String, seconds: i64) {
-    let today = Local::now().format("%Y-%m-%d").to_string();
-    db::add_usage(&app_name, &today, seconds);
-}
+
+
 
 #[command]
 fn get_usage_today() -> Vec<db::AppUsage> {

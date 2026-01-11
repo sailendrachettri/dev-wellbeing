@@ -46,7 +46,7 @@ const DailyAppUsesChart = ({ date }) => {
   const totalSeconds = apps.reduce((acc, a) => acc + a.seconds, 0) || 1;
 
   return (
-    <div className="bg-linear-to-br from-zinc-900 mt-16 via-zinc-900 to-dark rounded-2xl p-6 shadow-2xl border border-dark">
+    <div className="bgzinc-900 mx-2 mt-16 rounded-2xl p-6 shadow-2xl border border-dark">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

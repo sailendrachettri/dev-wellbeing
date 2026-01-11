@@ -32,7 +32,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="p-6 min-h-screen bg-zinc-900 text-white">
+    <>
       {loading ? (
         <div className="min-h-screen overflow-hidden flex items-center justify-center">
           <div className="flex items-center justify-center flex-col gap-y-2">
@@ -41,7 +41,7 @@ const Home = () => {
           </div>
         </div>
       ) : (
-        <div>
+        <div className="min-h-screen bg-zinc-900 text-white py-5">
           <DailyTimelineChart
             setSelectedDate={setSelectedDate}
             selectedDate={selectedDate}
@@ -49,7 +49,7 @@ const Home = () => {
           <DailyAppUsesChart date={selectedDate} />
         </div>
       )}
-    </div>
+    </>
   );
 };
 

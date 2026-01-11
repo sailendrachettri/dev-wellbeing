@@ -4,7 +4,7 @@
 
 
 ## Download the app for Windows
-- Step 1: [All Version](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
+- Step 1: [Download App](https://github.com/sailendrachettri/dev-wellbeing/blob/main/apps)
 - Step 2: Click on the version of app you want to download
 - Step 3: Now click on **View Raw** to download or click a download icon
 

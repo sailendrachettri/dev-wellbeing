@@ -9,6 +9,7 @@ import { formatPrettyDate } from "../utils/date-time/formatPrettyDate";
 import { formatDateShort } from "../utils/date-time/formatDateShort";
 import LoadingApp from "./common/LoadingApp";
 import Pomodoro from "./pomodoro/Pomodoro";
+import TabDropdown from "./common/TabDropdown";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
@@ -44,31 +45,7 @@ const Home = () => {
       ) : (
         <>
         {/* Tabs */}
-          <div className="flex gap-x-2 flex-nowrap rounded-md pt-3 pl-5 text-xs">
-            <button
-              onClick={() => setSelectedTab("wellbeing")}
-              className={`px-3 py-1 rounded-full border border-zinc-800 transition-all duration-200
-      ${
-        selectedTab === "wellbeing"
-          ? "bg-primary/70 text-white"
-          : "text-gray-500 cursor-pointer"
-      }`}
-            >
-              Wellbeing
-            </button>
-
-            <button
-              onClick={() => setSelectedTab("pomodoro")}
-              className={`px-3 py-1 rounded-full border  border-zinc-800 transition-all duration-200
-      ${
-        selectedTab === "pomodoro"
-          ? "bg-primary/70 text-white"
-          : "text-gray-500 cursor-pointer"
-      }`}
-            >
-              Pomodoro
-            </button>
-          </div>
+         <TabDropdown selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
           {/* Dev Wellbeing */}
           {selectedTab == "wellbeing" && (

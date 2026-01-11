@@ -1,0 +1,49 @@
+import { useState } from "react";
+
+const TabDropdown = ({ selectedTab, setSelectedTab }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative pt-3 pl-5 text-xs">
+      <button
+        onClick={() => setOpen(!open)}
+        className="
+          px-3 py-1 rounded-full
+          border border-zinc-800
+          bg-zinc-900 text-white
+          flex items-center gap-2 cursor-pointer
+        "
+      >
+        {selectedTab === "wellbeing" ? "Wellbeing" : "Pomodoro"}
+        <span className="text-gray-400">▾</span>
+      </button>
+
+      {open && (
+        <div className="absolute mt-2 w-32 rounded-md border border-zinc-800 bg-zinc-900 shadow-lg">
+          {["wellbeing", "pomodoro"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setSelectedTab(tab);
+                setOpen(false);
+              }}
+              className={`
+                w-full text-left px-3 py-2 cursor-pointer
+                hover:bg-primary/70
+                ${
+                  selectedTab === tab
+                    ? "text-white"
+                    : "text-gray-400 hover:text-gray-100"
+                }
+              `}
+            >
+              {tab === "wellbeing" ? "Wellbeing" : "Pomodoro"}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TabDropdown;

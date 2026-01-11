@@ -1,0 +1,4 @@
+{
+     "identifier": "notification",
+  "permissions": ["notification:allow-notify"]
+}

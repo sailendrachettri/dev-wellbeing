@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { FaPlay, FaPause, FaRedo, FaCog, FaTimes } from "react-icons/fa";
-import beepSound from "../../assets/sounds/beep.mp3";
+import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
+import { sendNotification } from "@tauri-apps/plugin-notification";
 
 const DEFAULT_TIME = 25 * 60; // 25 minutes in seconds
 
@@ -13,11 +13,47 @@ const Pomodoro = () => {
 
   const intervalRef = useRef(null);
   const beepRef = useRef(null);
+  const notifiedRef = useRef(false);
 
   // Calculate progress percentage
   const progress = ((totalSeconds - secondsLeft) / totalSeconds) * 100;
   const circumference = 2 * Math.PI * 140; // radius = 140
   const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  const start = () => setIsRunning(true);
+  const pause = () => setIsRunning(false);
+
+  const reset = () => {
+    setIsRunning(false);
+    setSecondsLeft(totalSeconds);
+    notifiedRef.current = false; // allow notification next round
+  };
+
+  const applyCustomTime = () => {
+    const newTime = customMinutes * 60;
+    setActivePreset(null);
+    setIsRunning(false);
+    setSecondsLeft(newTime);
+    setTotalSeconds(newTime);
+    notifiedRef.current = false;
+  };
+
+  const setPreset = (minutes) => {
+    setActivePreset(minutes);
+    setCustomMinutes(minutes);
+    const newTime = minutes * 60;
+    setIsRunning(false);
+    setSecondsLeft(newTime);
+    setTotalSeconds(newTime);
+    notifiedRef.current = false;
+  };
+
+  const showNotification = () => {
+    sendNotification({
+      title: "Pomodoro Complete 🍅",
+      body: "Great job! Time to take a break.",
+    });
+  };
 
   // Format time mm:ss
   const formatTime = (seconds) => {
@@ -28,74 +64,67 @@ const Pomodoro = () => {
     return `${m}:${s}`;
   };
 
-  // Timer logic
-  useEffect(() => {
-    if (!isRunning) return;
-
-    intervalRef.current = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current);
-          setIsRunning(false);
-          playBeep();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(intervalRef.current);
-  }, [isRunning]);
-
-  const playBeep = () => {
+  const playBeep = async () => {
     if (!beepRef.current) return;
 
-    // Play 3 beeps
     let count = 0;
 
-    const play = () => {
+    const play = async () => {
       if (count >= 3) return;
 
-      beepRef.current.currentTime = 0;
-      beepRef.current.play();
-      count++;
-
-      setTimeout(play, 400);
+      try {
+        beepRef.current.currentTime = 0;
+        await beepRef.current.play();
+        count++;
+        setTimeout(play, 400);
+      } catch (err) {
+        console.error("Audio play failed:", err);
+      }
     };
 
     play();
   };
 
+  // Timer logic
   useEffect(() => {
-    beepRef.current = new Audio(beepSound);
-    beepRef.current.volume = 0.8; // adjust if needed
+    if (!isRunning) return;
+
+    const tick = () => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+          setIsRunning(false);
+
+          if (!notifiedRef.current) {
+            notifiedRef.current = true; // ✅ mark as notified
+            playBeep();
+            showNotification();
+          }
+
+          return 0;
+        }
+        return prev - 1;
+      });
+    };
+
+    intervalRef.current = setInterval(tick, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isRunning]);
+
+  useEffect(() => {
+    const audioSrc = new URL("../../assets/sounds/beep.mp3", import.meta.url)
+      .href;
+
+    beepRef.current = new Audio(audioSrc);
+    beepRef.current.volume = 0.8;
   }, []);
-
-  const start = () => setIsRunning(true);
-  const pause = () => setIsRunning(false);
-
-  const reset = () => {
-    setIsRunning(false);
-    setSecondsLeft(totalSeconds);
-  };
-
-  const applyCustomTime = () => {
-    const newTime = customMinutes * 60;
-    setActivePreset(null); // custom time selected
-    setIsRunning(false);
-    setSecondsLeft(newTime);
-    setTotalSeconds(newTime);
-  };
-
-  const setPreset = (minutes) => {
-    setActivePreset(minutes);
-    setCustomMinutes(minutes);
-
-    const newTime = minutes * 60;
-    setIsRunning(false);
-    setSecondsLeft(newTime);
-    setTotalSeconds(newTime);
-  };
 
   return (
     <div className="flex items-center justify-center flex-col shadow-md mb-4  mx-5 min-h-[85vh] rounded-lg overflow-hidden">
@@ -143,7 +172,7 @@ const Pomodoro = () => {
 
               <button
                 onClick={applyCustomTime}
-                className="ml-1 px-2 py-0.5 text-xs rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+                className="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary text-white hover:bg-primary/90 cursor-pointer transition"
               >
                 Go
               </button>

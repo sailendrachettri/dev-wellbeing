@@ -36,6 +36,7 @@ fn main() {
             Some(vec!["--minimized"]),
         ))
         .plugin(tauri_plugin_log::Builder::default().build())
+        .plugin(tauri_plugin_notification::init())
         .manage(ActiveAppState {
             current_app: Arc::new(Mutex::new(None)),
             start_time: Arc::new(Mutex::new(std::time::Instant::now())),

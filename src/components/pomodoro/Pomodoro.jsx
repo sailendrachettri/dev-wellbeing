@@ -50,7 +50,7 @@ const Pomodoro = () => {
 
   const showNotification = () => {
     sendNotification({
-      title: "Pomodoro Complete 🍅",
+      title: "Pomodoro Completed 🎉",
       body: "Great job! Time to take a break.",
     });
   };

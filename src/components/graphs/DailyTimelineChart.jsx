@@ -14,7 +14,6 @@ import { useRef } from "react";
 import { addDays } from "../../utils/date-time/addDays";
 import { getTodayDate } from "../../utils/date-time/getTodayDate";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
-import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
 import { formatDateShort } from "../../utils/date-time/formatDateShort";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
@@ -192,33 +191,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   return (
     <div className="px-6">
       <div className="bg-zinc-900 rounded-xl  shadow-lg">
-        {/* Header */}
-        {/* <div className="flex items-center justify-between mb-10">
-          <div>
-            <div className="text-xl flex items-center justify-start flex-nowrap gap-x-2 font-bold text-white">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-9 text-primary"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"
-                />
-              </svg>
-              <div>
-                <p>Weekly Usage Timeline</p>
-                <p className="text-sm font-normal text-gray-400">
-                  {startLabel} – {endLabel}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div> */}
+      
 
         {/* Chart */}
         <div className="h-75">

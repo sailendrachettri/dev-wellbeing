@@ -47,19 +47,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
 
   return (
     <div className="bgzinc-900 mx-2 mt-16 rounded-2xl p-6 border-dark">
-      {/* Header */}
-      {/* <div className="flex items-center justify-between mb-6">
-        <div>
-          <h3 className="text-xl font-bold text-white mb-1">Today</h3>
-          <p className="text-sm text-gray-400">{formatPrettyDate(date)}</p>
-        </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold text-primary">
-            {formatSeconds(totalSeconds)}
-          </div>
-          <div className="text-xs text-gray-500">total time</div>
-        </div>
-      </div> */}
+     
 
       {apps.length === 0 ? (
         <div className="text-center py-12">

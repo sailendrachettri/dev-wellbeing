@@ -24,12 +24,22 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
+use windows::{
+    core::PCWSTR,
+    Win32::System::Threading::CreateMutexW,
+};
+use windows::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError};
+
+
+
 struct ActiveAppState {
     current_app: Arc<Mutex<Option<String>>>,
     start_time: Arc<Mutex<std::time::Instant>>,
 }
 
 fn main() {
+    ensure_single_instance();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
@@ -42,6 +52,7 @@ fn main() {
             start_time: Arc::new(Mutex::new(std::time::Instant::now())),
         })
         .setup(|app| {
+            
             let handle = app.handle();
             setup_tray(&handle)?;
 
@@ -86,6 +97,32 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
+
+fn ensure_single_instance() {
+    unsafe {
+        let name: Vec<u16> = "dev-wellbeing-single-instance"
+            .encode_utf16()
+            .chain(std::iter::once(0))
+            .collect();
+
+        let _ = CreateMutexW(
+            None,
+            false,
+            PCWSTR(name.as_ptr()),
+        );
+
+
+        // GetLastError returns Result<(), Error>
+        if let Err(err) = GetLastError() {
+            if err.code() == ERROR_ALREADY_EXISTS.into() {
+                std::process::exit(0);
+            }
+        }
+    }
+}
+
+
+
 
 fn is_system_app(app_name: &str) -> bool {
     let app = app_name.to_lowercase();

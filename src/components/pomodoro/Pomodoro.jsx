@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FaPlay, FaPause, FaRedo } from "react-icons/fa";
 import { showNotification } from "../../utils/notifications/notificationMessages";
+import beepSound from "../../assets/sounds/beep.mp3";
 
 const DEFAULT_TIME = 25 * 60; // 25 minutes in seconds
 
@@ -36,6 +37,7 @@ const Pomodoro = () => {
     setSecondsLeft(newTime);
     setTotalSeconds(newTime);
     notifiedRef.current = false;
+    setIsRunning(true);
   };
 
   const setPreset = (minutes) => {
@@ -47,8 +49,6 @@ const Pomodoro = () => {
     setTotalSeconds(newTime);
     notifiedRef.current = false;
   };
-
- 
 
   // Format time mm:ss
   const formatTime = (seconds) => {
@@ -114,10 +114,7 @@ const Pomodoro = () => {
   }, [isRunning]);
 
   useEffect(() => {
-    const audioSrc = new URL("../../assets/sounds/beep.mp3", import.meta.url)
-      .href;
-
-    beepRef.current = new Audio(audioSrc);
+    beepRef.current = new Audio(beepSound);
     beepRef.current.volume = 0.8;
   }, []);
 

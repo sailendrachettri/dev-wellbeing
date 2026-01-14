@@ -47,7 +47,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
   setTotalSecondsSpent(totalSeconds);
 
   return (
-    <div className="bgzinc-900 mx-2 mt-16 rounded-2xl p-6 border-dark">
+    <div className="bg-zinc-900 mx-2 mt-16 rounded-2xl p-6 border-dark">
       {apps.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-3">📊</div>
@@ -56,38 +56,33 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
       ) : (
         <>
           <div className="space-y-4 ">
-            {sortedApps.map((app, idx) => {
-              const percent = Math.round((app.seconds / totalSeconds) * 100);
-              const isHidden = idx >= 3 && !showAll;
+            {sortedApps?.map((app, idx) => {
+              const percent = Math.round((app?.seconds / totalSeconds) * 100);
+              const isHidden = idx >= 5 && !showAll;
+              const marginBottom = !isHidden && idx < 4 ? "mb-4" : "";
 
               return (
                 <div
-                  key={app.app}
-                  className={`
-        transition-all duration-500 ease-in-out
-        overflow-hidden
-        ${
-          isHidden
-            ? "max-h-0 opacity-0 scale-[0.98]"
-            : "max-h-[120px] opacity-100 scale-100"
-        }
-      `}
+                  key={app?.app}
+                   className={`transition-all duration-500 ease-in-out overflow-hidden ${marginBottom}
+          ${isHidden ? "max-h-0 opacity-0 scale-[0.98]" : "max-h-[120px] opacity-100 scale-100"}
+        `}
                 >
                   <div className="bg-dark/50 backdrop-blur rounded-xl p-4 hover:bg-dark/70 transition-all duration-300 border border-zinc-700/50">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="text-2xl">{getAppIcon(app.app)}</div>
+                        <div className="text-2xl">{getAppIcon(app?.app)}</div>
                         <div>
                           <div className="font-semibold text-white">
-                            {formatAppName(app.app)}
+                            {formatAppName(app?.app)}
                           </div>
                           <div className="text-xs text-gray-400">
-                            {formatSeconds(app.seconds)} • {percent}% of total
+                            {formatSeconds(app?.seconds)} • {percent}% of total
                           </div>
                         </div>
                       </div>
                       <div className="text-lg font-bold text-primary">
-                        {formatSeconds(app.seconds)}
+                        {formatSeconds(app?.seconds)}
                       </div>
                     </div>
 
@@ -104,8 +99,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
               );
             })}
           </div>
-
-          {sortedApps.length > 3 && (
+          {sortedApps.length > 5 && (
             <button
               onClick={() => setShowAll((v) => !v)}
               className="mt-4 w-full text-sm text-primary transition cursor-pointer"
@@ -115,6 +109,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
                 : `Show ${sortedApps.length - 3} more apps`}
             </button>
           )}
+
         </>
       )}
     </div>

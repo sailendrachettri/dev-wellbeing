@@ -2,7 +2,6 @@ import { sendNotification } from "@tauri-apps/plugin-notification";
 
 const notificationMessages = [
   "Great job! Time to take a short break",
-  "Pomodoro complete! Stretch your legs",
   "You crushed it! Grab a coffee",
   "Time's up! Breathe and relax",
   "Well done! Let your mind recharge",

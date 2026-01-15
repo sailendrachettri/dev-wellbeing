@@ -28,84 +28,11 @@ pub struct DailyTotalUsage {
     pub total_seconds: i64,
 }
 
-// pub fn delete_system_apps(conn: &Connection) -> Result<()> {
-//     let system_keywords = [
-//         "explorer",
-//         "searchhost",
-//         "startmenuexperiencehost",
-//         "shellexperiencehost",
-//         "applicationframehost",
-//         "runtimebroker",
-//         "systemsettings",
-//         "taskmgr",
-//         "smartscreen",
-//         "ctfmon",
-//         "lockapp",
-//         "winlogon",
-//         "explorer.exe",
-//         "WindowsTerminal.exe",
-//         "Msedgewebview2",
-//         "msedgewebview2.exe",
-//         "msedgewebview2",
-//         "dwm",
-//         "app",
-//         "app.exe",
-//         "App.exe",
-//         "App",
-//         "code.exe",
-//         "code",
-//         "msedge",
-//         "lock app", 
-//          "WindowsTerminal.exe",
-//         "explorer",
-//         "shellexperiencehost",
-//         "applicationframehost",
-//         "searchhost",
-//         "startmenuexperiencehost",
-//         "systemsettings",
-//         "lockapp",
-//         "lock app",
-//         "runtimebroker",
-//         "smartscreen",
-//         "ctfmon",
-//         "winlogon",
-//         "dwm",
-//         "taskmgr",
-//         "msedgewebview2",
-//         "webview2",
-//         "edgewebview",
-//         "svchost",
-//         "services",
-//         "conhost",
-//         "dllhost",
-//         "fontdrvhost",
-//         "csrss",
-//         "lsass",
-//         "Code.exe",
-//         "Code",
-//         "code",
-//         "code.exe",
-//         "windowsterminal",
-//         "powershell",
-//         "pwsh",
-//         "cmd",
-//         "\\windows\\system32",
-//         "\\windowsapps\\",
-//         "\\program files\\windowsapps",
-//         "app.exe",
-//         "app",
-//         "dev-wellbeing",
-//     ];
+// pub fn delete_all_entries() -> Result<()> {
+//     let conn = get_db()?;
 
-//     let mut stmt = conn.prepare(
-//         "DELETE FROM app_usage
-//          WHERE LOWER(app_name) LIKE '%' || ?1 || '%'"
-//     )?;
-
-//     for keyword in system_keywords {
-//         stmt.execute([keyword])?;
-//     }
-
+//     conn.execute("DELETE FROM app_usage", params![])?;
+//     println!("All entries deleted from app_usage table.");
 //     Ok(())
 // }
 

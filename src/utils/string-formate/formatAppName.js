@@ -1,4 +1,10 @@
-export function formatAppName(rawName) {
+export function formatAppName(rawPath) {
+  if (!rawPath) return "";
+
+  // Extract base file name
+  const parts = rawPath.split(/[/\\]/); // split on / or \
+  let rawName = parts[parts.length - 1]; // last part of path
+
   const name = rawName.toLowerCase();
 
   const appMap = {
@@ -9,6 +15,7 @@ export function formatAppName(rawName) {
     "msedge.exe": "Microsoft Edge",
     "chrome.exe": "Google Chrome",
     "firefox.exe": "Firefox",
+    "brave.exe": "Brave Browser",
     "app.exe": "Dev Wellbeing",
   };
 
@@ -28,10 +35,8 @@ export function formatAppName(rawName) {
 
   // Capitalize words
   cleaned = cleaned
-    .split(" ")
-    .map(
-      w => w.charAt(0).toUpperCase() + w.slice(1)
-    )
+    .split(/[\s-_]+/) // split by space, dash, underscore
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 
   return cleaned;

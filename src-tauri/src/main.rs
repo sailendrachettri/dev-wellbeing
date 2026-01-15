@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod db;
+mod icon; 
 use chrono::Local;
 use rusqlite::Connection;
 use std::sync::{Arc, Mutex};
@@ -39,6 +40,7 @@ struct ActiveAppState {
 
 fn main() {
     ensure_single_instance();
+    // db::delete_all_entries()?;
 
     tauri::Builder::default()
         .plugin(tauri_plugin_autostart::init(
@@ -56,11 +58,10 @@ fn main() {
             let handle = app.handle();
             setup_tray(&handle)?;
 
-            // Cleanup  the unnecessary code
-            // if let Err(e) = cleanup_invalid_usage_data() {
-            //     eprintln!("Cleanup failed: {}", e);
+            // Clean up: delete all the data from database
+            //        if let Err(e) = db::delete_all_entries() {
+            // eprintln!("Failed to delete all entries: {}", e);
             // }
-            
 
             let args: Vec<String> = std::env::args().collect();
             let minimized = args.contains(&"--minimized".to_string());
@@ -87,6 +88,7 @@ fn main() {
             }
         })
         .invoke_handler(tauri::generate_handler![
+            icon::get_app_icon,
             get_active_app,
             save_app_usage,
             get_usage_today,
@@ -344,7 +346,7 @@ fn get_usage_today() -> Vec<db::AppUsage> {
     db::get_usage_today().unwrap_or_default()
 }
 
-#[command]
+#[tauri::command]
 fn get_active_app() -> Option<String> {
     unsafe {
         let hwnd = GetForegroundWindow();
@@ -369,13 +371,8 @@ fn get_active_app() -> Option<String> {
         .ok()?;
 
         let full_path = String::from_utf16_lossy(&buffer[..size as usize]);
+        // println!("path: {}", full_path);
 
-        Some(
-            full_path
-                .rsplit('\\')
-                .next()
-                .unwrap_or(&full_path)
-                .to_string(),
-        )
+        Some(full_path) // ✅ return the full path
     }
 }

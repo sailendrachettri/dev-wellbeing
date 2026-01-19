@@ -39,10 +39,22 @@ struct ActiveAppState {
 }
 
 fn main() {
-    ensure_single_instance();
+    // ensure_single_instance();
     // db::delete_all_entries()?;
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(win) = app.get_webview_window("main") {
+                let _ = win.unminimize();
+                let _ = win.show();
+                let _ = win.set_focus();
+
+                // Windows focus reliability trick
+                let _ = win.set_always_on_top(true);
+                let _ = win.set_always_on_top(false);
+            }
+        }))
+
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec!["--minimized"]),
@@ -100,28 +112,28 @@ fn main() {
         .expect("error while running tauri app");
 }
 
-fn ensure_single_instance() {
-    unsafe {
-        let name: Vec<u16> = "dev-wellbeing-single-instance"
-            .encode_utf16()
-            .chain(std::iter::once(0))
-            .collect();
+// fn ensure_single_instance() {
+//     unsafe {
+//         let name: Vec<u16> = "dev-wellbeing-single-instance"
+//             .encode_utf16()
+//             .chain(std::iter::once(0))
+//             .collect();
 
-        let _ = CreateMutexW(
-            None,
-            false,
-            PCWSTR(name.as_ptr()),
-        );
+//         let _ = CreateMutexW(
+//             None,
+//             false,
+//             PCWSTR(name.as_ptr()),
+//         );
 
 
-        // GetLastError returns Result<(), Error>
-        if let Err(err) = GetLastError() {
-            if err.code() == ERROR_ALREADY_EXISTS.into() {
-                std::process::exit(0);
-            }
-        }
-    }
-}
+//         // GetLastError returns Result<(), Error>
+//         if let Err(err) = GetLastError() {
+//             if err.code() == ERROR_ALREADY_EXISTS.into() {
+//                 std::process::exit(0);
+//             }
+//         }
+//     }
+// }
 
 
 

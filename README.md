@@ -13,6 +13,5 @@
 <p><img src="https://drive.google.com/uc?export=view&id=1zycnp6wpqEqqFMsnVFfDgdOzPlmHCNNi" alt="Today View"></p>
 
 ## Features to be added
-- App specific icon 
 - Note taking
 - App Lock

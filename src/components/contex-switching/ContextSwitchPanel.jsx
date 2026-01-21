@@ -73,7 +73,7 @@ export default function ContextSwitchPanel() {
       <div className="bg-zinc-800/50 rounded-lg">
         <button
           onClick={() => setShowHelp((p) => !p)}
-          className="w-full flex items-center justify-between px-3 py-2 text-sm text-slate-300"
+          className="w-full flex items-center justify-between px-3 py-2 cursor-pointer  text-sm text-slate-300"
         >
           <span>What is context switching?</span>
           {showHelp ? <FiChevronUp /> : <FiChevronDown />}

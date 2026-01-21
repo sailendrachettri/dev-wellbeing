@@ -39,7 +39,7 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
             >
               {tab === "wellbeing" && "Wellbeing" }
               {tab === "pomodoro" && "Pomodoro" }
-              {tab === "context-switches" && "Context Switches" }
+              {tab === "context-switches" && "Context Switching" }
             </button>
           ))}
         </div>

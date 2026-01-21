@@ -10,6 +10,7 @@ import { formatDateShort } from "../utils/date-time/formatDateShort";
 import LoadingApp from "./common/LoadingApp";
 import Pomodoro from "./pomodoro/Pomodoro";
 import TabDropdown from "./common/TabDropdown";
+import ContextSwitchPanel from "./contex-switching/ContextSwitchPanel";
 
 const Home = () => {
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
@@ -44,12 +45,15 @@ const Home = () => {
         <LoadingApp />
       ) : (
         <>
-        {/* Tabs */}
-         <TabDropdown selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+          {/* Tabs */}
+          <TabDropdown
+            selectedTab={selectedTab}
+            setSelectedTab={setSelectedTab}
+          />
 
           {/* Dev Wellbeing */}
           {selectedTab == "wellbeing" && (
-            <div className="min-h-screen bg-zinc-900 text-white py-5">
+            <div className="min-h-screen bg-dark text-white py-5">
               <div className="flex items-center flex-col justify-center mb-6">
                 <div className="text-4xl font-bold text-primary">
                   {formatSeconds(totalSecondsSpent)}
@@ -65,6 +69,7 @@ const Home = () => {
                 setSelectedDate={setSelectedDate}
                 selectedDate={selectedDate}
               />
+
               <DailyAppUsesChart
                 date={selectedDate}
                 setTotalSecondsSpent={setTotalSecondsSpent}
@@ -80,6 +85,9 @@ const Home = () => {
               </div>
             </>
           )}
+
+          {/* Contex Switching */}
+          {selectedTab == "context-switches" && <ContextSwitchPanel />}
         </>
       )}
     </>

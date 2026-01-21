@@ -9,8 +9,8 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
         onClick={() => setOpen(!open)}
         className="
           px-3 py-1 rounded-full
-          border border-zinc-800
-          bg-zinc-900 text-white
+          border border-border-dark
+          bg-dark text-white
           flex items-center gap-2 cursor-pointer
         "
       >
@@ -19,8 +19,8 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
       </button>
 
       {open && (
-        <div className="absolute mt-2 w-32 rounded-md border border-zinc-800 bg-zinc-900 shadow-lg">
-          {["wellbeing", "pomodoro"].map((tab) => (
+        <div className="absolute mt-2 w-32 rounded-md border border-border-dark bg-dark shadow-lg">
+          {["wellbeing", "pomodoro", "context-switches"].map((tab) => (
             <button
               key={tab}
               onClick={() => {
@@ -37,7 +37,9 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
                 }
               `}
             >
-              {tab === "wellbeing" ? "Wellbeing" : "Pomodoro"}
+              {tab === "wellbeing" && "Wellbeing" }
+              {tab === "pomodoro" && "Pomodoro" }
+              {tab === "context-switches" && "Context Switches" }
             </button>
           ))}
         </div>

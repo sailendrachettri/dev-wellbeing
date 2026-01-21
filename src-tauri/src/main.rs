@@ -25,6 +25,8 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
+const CONTEXT_SWITCH_THRESHOLD: i64 = 30; // seconds
+
 
 
 struct ActiveAppState {
@@ -95,12 +97,17 @@ fn main() {
             get_usage_by_date,
             get_week_timeline_usage,
             get_earliest_usage_date,
+            get_today_context_switches
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
 
 
+#[command]
+fn get_today_context_switches() -> Vec<db::ContextSwitch> {
+    db::get_today_context_switches().unwrap_or_default()
+}
 
 
 
@@ -170,20 +177,28 @@ fn start_background_tracking(app: AppHandle) {
             let mut current = current_app.lock().unwrap();
             let mut start = start_time.lock().unwrap();
 
-            if let Some(app_name) = &active_app {
-                if current.as_ref() != Some(app_name) {
-                    if let Some(prev_app) = current.as_ref() {
-                        let elapsed = start.elapsed().as_secs() as i64;
-                        if elapsed > 0 {
-                            let today = Local::now().format("%Y-%m-%d").to_string();
-                            db::add_usage(prev_app, &today, elapsed);
-                        }
-                    }
+           if let Some(app_name) = &active_app {
+    if current.as_ref() != Some(app_name) {
+        if let Some(prev_app) = current.as_ref() {
+            let elapsed = start.elapsed().as_secs() as i64;
 
-                    *current = Some(app_name.clone());
-                    *start = std::time::Instant::now();
-                }
-            } else if current.is_some() {
+            // ⏱️ Save normal usage
+            if elapsed > 0 {
+                let today = Local::now().format("%Y-%m-%d").to_string();
+                db::add_usage(prev_app, &today, elapsed);
+            }
+
+            // 🧠 Detect context switch
+            if elapsed <= CONTEXT_SWITCH_THRESHOLD {
+                db::add_context_switch(prev_app, app_name, elapsed);
+            }
+        }
+
+        *current = Some(app_name.clone());
+        *start = std::time::Instant::now();
+    }
+}
+ else if current.is_some() {
                 if let Some(prev_app) = current.take() {
                     let elapsed = start.elapsed().as_secs() as i64;
                     if elapsed > 0 {

@@ -9,8 +9,9 @@
 - Step 3: Now click on **View Raw** to download or click a download icon
 
 ## Screenshots
-<p><img src="https://drive.google.com/uc?export=view&id=150sHIU5hUSkLXqKag96lIe20L3ak1bTc" alt="Timeline View"></p>
-<p><img src="https://drive.google.com/uc?export=view&id=1zycnp6wpqEqqFMsnVFfDgdOzPlmHCNNi" alt="Today View"></p>
+<p><img src="https://drive.google.com/uc?export=view&id=1O-vLc3NIPe4REsu21OBXpzTsf-Qd--Ll" alt="Timeline View"></p>
+<p><img src="https://drive.google.com/uc?export=view&id=1hyfmMxjrZdKOSE2q1WQvEk0QmxuT5h-D" alt="Today View"></p>
+<p><img src="https://drive.google.com/uc?export=view&id=1TsORy3d2kMe7dpbx_lbTi3U-fZ5JLENo" alt="Pmodoro View"></p>
 
 ## Features to be added
 - Note taking

@@ -25,12 +25,6 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
-use windows::{
-    core::PCWSTR,
-    Win32::System::Threading::CreateMutexW,
-};
-use windows::Win32::Foundation::{ERROR_ALREADY_EXISTS, GetLastError};
-
 
 
 struct ActiveAppState {
@@ -39,7 +33,6 @@ struct ActiveAppState {
 }
 
 fn main() {
-    // ensure_single_instance();
     // db::delete_all_entries()?;
 
     tauri::Builder::default()
@@ -69,11 +62,6 @@ fn main() {
             
             let handle = app.handle();
             setup_tray(&handle)?;
-
-            // Clean up: delete all the data from database
-            //        if let Err(e) = db::delete_all_entries() {
-            // eprintln!("Failed to delete all entries: {}", e);
-            // }
 
             let args: Vec<String> = std::env::args().collect();
             let minimized = args.contains(&"--minimized".to_string());
@@ -112,28 +100,6 @@ fn main() {
         .expect("error while running tauri app");
 }
 
-// fn ensure_single_instance() {
-//     unsafe {
-//         let name: Vec<u16> = "dev-wellbeing-single-instance"
-//             .encode_utf16()
-//             .chain(std::iter::once(0))
-//             .collect();
-
-//         let _ = CreateMutexW(
-//             None,
-//             false,
-//             PCWSTR(name.as_ptr()),
-//         );
-
-
-//         // GetLastError returns Result<(), Error>
-//         if let Err(err) = GetLastError() {
-//             if err.code() == ERROR_ALREADY_EXISTS.into() {
-//                 std::process::exit(0);
-//             }
-//         }
-//     }
-// }
 
 
 

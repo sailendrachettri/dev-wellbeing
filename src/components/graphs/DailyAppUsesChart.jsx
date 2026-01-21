@@ -135,7 +135,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
             >
               {showAll
                 ? "Show less"
-                : `Show ${sortedApps.length - 3} more apps`}
+                : `Show ${sortedApps.length - 5} more apps`}
             </button>
           )}
         </>

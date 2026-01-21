@@ -16,3 +16,4 @@
 ## Features to be added
 - Note taking
 - App Lock
+- Context Switching Detector

@@ -87,6 +87,32 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   }, []);
 
   useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement ||
+      (e.target)?.isContentEditable
+    ) {
+      return;
+    }
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      handlePrev();
+    }
+
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      handleNext();
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+  return () => window.removeEventListener("keydown", handleKeyDown);
+}, [selectedDate, startDate, endDate, earliestDate]);
+
+
+  useEffect(() => {
     if (selectedDate < startDate) {
       setSelectedDate(startDate);
     } else if (selectedDate > endDate) {

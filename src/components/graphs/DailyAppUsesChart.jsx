@@ -3,13 +3,40 @@ import { invoke } from "@tauri-apps/api/core";
 import { formatAppName } from "../../utils/string-formate/formatAppName";
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 
-const colors = [
+export const colors = [
+  // Original
   "from-emerald-500 to-teal-500",
   "from-purple-500 to-pink-500",
   "from-pink-500 to-cyan-500",
   "from-orange-500 to-red-500",
   "from-yellow-500 to-amber-500",
+
+  // Blues & Cyans
+  "from-blue-500 to-cyan-500",
+  "from-sky-500 to-blue-600",
+  "from-cyan-500 to-teal-600",
+  "from-indigo-500 to-blue-500",
+
+  // Purples & Pinks
+  "from-fuchsia-500 to-purple-600",
+  "from-violet-500 to-fuchsia-500",
+  "from-rose-500 to-pink-600",
+  "from-pink-500 to-rose-500",
+
+  // Greens & Limes
+  "from-green-500 to-lime-500",
+  "from-lime-500 to-emerald-500",
+  "from-teal-500 to-green-600",
+
+  // Warm / Sunset
+  "from-amber-500 to-orange-500",
+  "from-red-500 to-rose-600",
+  "from-orange-500 to-pink-500",
+
+  // Dark / Moody (great for focus apps)
+  "from-slate-700 to-slate-900",
 ];
+
 
 const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
   const [apps, setApps] = useState([]);
@@ -135,7 +162,7 @@ const DailyAppUsesChart = ({ date, setTotalSecondsSpent }) => {
             >
               {showAll
                 ? "Show less"
-                : `Show ${sortedApps.length - 3} more apps`}
+                : `Show ${sortedApps.length - 5} more apps`}
             </button>
           )}
         </>

@@ -3,8 +3,12 @@ import { invoke } from "@tauri-apps/api/core";
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { formatAppName } from "../../utils/string-formate/formatAppName";
 import { TiFlowSwitch } from "react-icons/ti";
+import { getTopTransition } from "../../utils/matix/getTopTransition";
+import Metric from "../../utils/matix/Metric";
 
 const MAX_VISIBLE = 5;
+
+
 
 export default function ContextSwitchPanel() {
   const [switches, setSwitches] = useState([]);
@@ -97,29 +101,7 @@ export default function ContextSwitchPanel() {
   );
 }
 
-const getTopTransition = (switches) => {
-  const map = {};
 
-  switches?.forEach((s) => {
-    const key = `${s?.from_app} → ${s?.to_app}`;
-    map[key] = (map[key] || 0) + 1;
-  });
 
-  return Object.entries(map).sort((a, b) => b[1] - a[1])[0];
-};
 
-function Metric({ label, value, truncate }) {
-  return (
-    <div className="bg-[#212126] rounded-lg p-3">
-      <div className="text-xs text-slate-400">{label}</div>
-      <div
-        className={`text-lg font-semibold text-white ${
-          truncate ? "truncate" : ""
-        }`}
-        title={value}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
+

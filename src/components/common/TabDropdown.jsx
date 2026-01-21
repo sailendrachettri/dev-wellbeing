@@ -9,7 +9,7 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
         onClick={() => setOpen(!open)}
         className="
           px-3 py-1 rounded-full
-          border border-border-dark
+          border border-zinc-800
           bg-dark text-white
           flex items-center gap-2 cursor-pointer
         "
@@ -19,7 +19,7 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
       </button>
 
       {open && (
-        <div className="absolute mt-2 w-32 rounded-md border border-border-dark bg-dark shadow-lg">
+        <div className="absolute mt-2 w-32 rounded-md z-40 border border-zinc-800 bg-dark shadow-lg">
           {["wellbeing", "pomodoro", "context-switches"].map((tab) => (
             <button
               key={tab}

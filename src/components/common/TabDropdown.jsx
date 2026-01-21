@@ -14,7 +14,9 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
           flex items-center gap-2 cursor-pointer
         "
       >
-        {selectedTab === "wellbeing" ? "Wellbeing" : "Pomodoro"}
+        {selectedTab === "wellbeing" && "Wellbeing"}
+        {selectedTab === "pomodoro" && "Pomodoro"}
+        {selectedTab === "context-switches" && "Context Switching"}
         <span className="text-gray-400">▾</span>
       </button>
 
@@ -37,9 +39,9 @@ const TabDropdown = ({ selectedTab, setSelectedTab }) => {
                 }
               `}
             >
-              {tab === "wellbeing" && "Wellbeing" }
-              {tab === "pomodoro" && "Pomodoro" }
-              {tab === "context-switches" && "Context Switching" }
+              {tab === "wellbeing" && "Wellbeing"}
+              {tab === "pomodoro" && "Pomodoro"}
+              {tab === "context-switches" && "Context Switching"}
             </button>
           ))}
         </div>

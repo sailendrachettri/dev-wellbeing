@@ -27,8 +27,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
 
   const [page, setPage] = useState(0);
   const [data, setData] = useState([]);
-  const { startDate, endDate, weekDates } =
-    getWeekRange(page);
+  const { startDate, endDate, weekDates } = getWeekRange(page);
   const chartRef = useRef(null);
   const isPrevDisabled = earliestDate ? selectedDate <= earliestDate : true;
 
@@ -40,7 +39,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
       event.nativeEvent,
       "nearest",
       { intersect: true },
-      true
+      true,
     );
 
     if (!elements.length) return;
@@ -87,30 +86,29 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   }, []);
 
   useEffect(() => {
-  const handleKeyDown = (e) => {
-    if (
-      e.target instanceof HTMLInputElement ||
-      e.target instanceof HTMLTextAreaElement ||
-      (e.target)?.isContentEditable
-    ) {
-      return;
-    }
+    const handleKeyDown = (e) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target?.isContentEditable
+      ) {
+        return;
+      }
 
-    if (e.key === "ArrowLeft") {
-      e.preventDefault();
-      handlePrev();
-    }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handlePrev();
+      }
 
-    if (e.key === "ArrowRight") {
-      e.preventDefault();
-      handleNext();
-    }
-  };
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleNext();
+      }
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
-  return () => window.removeEventListener("keydown", handleKeyDown);
-}, [selectedDate, startDate, endDate, earliestDate]);
-
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedDate, startDate, endDate, earliestDate]);
 
   useEffect(() => {
     if (selectedDate < startDate) {
@@ -155,13 +153,13 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   }, [page, startDate, endDate]);
 
   const usageMap = Object.fromEntries(
-    data.map((d) => [d.date, d.total_seconds])
+    data.map((d) => [d.date, d.total_seconds]),
   );
 
   const values = weekDates.map((date) => usageMap[date] ?? 0);
 
   const backgroundColors = weekDates.map((date) =>
-    date === selectedDate ? SELECTED_COLOR : FADED_COLOR
+    date === selectedDate ? SELECTED_COLOR : FADED_COLOR,
   );
 
   const chartData = {
@@ -217,8 +215,6 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
   return (
     <div className="px-6">
       <div className="bg-zinc-900 rounded-xl  shadow-lg">
-      
-
         {/* Chart */}
         <div className="h-75">
           {data.length === 0 ? (
@@ -244,7 +240,7 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
             isPrevDisabled ? "cursor-not-allowed invisible" : "cursor-pointer"
           } px-2 py-1 bg-dark rounded hover:bg-zinc-700 disabled:opacity-40`}
         >
-         <IoIosArrowDropleft size={22} />
+          <IoIosArrowDropleft size={22} />
         </button>
 
         <div>{formatDateShort(selectedDate)}</div>

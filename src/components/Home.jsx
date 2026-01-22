@@ -18,26 +18,9 @@ const Home = () => {
   const [totalSecondsSpent, setTotalSecondsSpent] = useState(0);
   const [selectedTab, setSelectedTab] = useState("wellbeing");
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const app = await invoke("get_active_app");
-
-        if (app) {
-          await invoke("save_app_usage", {
-            appName: app,
-            seconds: 5,
-          });
-        }
-      } catch (err) {
-        console.error("Usage tracking failed:", err);
-      } finally {
-        setLoading(false);
-      }
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
+  setTimeout(() => {
+    setLoading(false);
+  }, 700);
 
   return (
     <>

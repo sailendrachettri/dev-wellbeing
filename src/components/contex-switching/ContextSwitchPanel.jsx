@@ -49,6 +49,7 @@ export default function ContextSwitchPanel() {
   const topTransition = useMemo(() => getTopTransition(switches), [switches]);
 
   const visibleSwitches = showAll ? switches : switches.slice(0, MAX_VISIBLE);
+  console.log(visibleSwitches);
 
   return (
     <>

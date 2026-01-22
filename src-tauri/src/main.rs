@@ -25,6 +25,9 @@ use windows::{
     Win32::UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
+const CONTEXT_SWITCH_THRESHOLD: i64 = 30; 
+const TRACK_INTERVAL: u64 = 5;
+const FLUSH_INTERVAL: i64 = 30; 
 
 
 struct ActiveAppState {
@@ -95,11 +98,17 @@ fn main() {
             get_usage_by_date,
             get_week_timeline_usage,
             get_earliest_usage_date,
+            get_context_switches_by_date
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
 
+
+#[tauri::command]
+fn get_context_switches_by_date(date: String) -> Vec<db::ContextSwitch> {
+    db::get_context_switches_by_date(&date).unwrap_or_default()
+}
 
 
 
@@ -145,7 +154,6 @@ fn is_system_app(app_name: &str) -> bool {
     system_apps.iter().any(|k| app.contains(k))
 }
 
-
 fn start_background_tracking(app: AppHandle) {
     let state = app.state::<ActiveAppState>();
     let current_app = state.current_app.clone();
@@ -154,48 +162,60 @@ fn start_background_tracking(app: AppHandle) {
     async_runtime::spawn(async move {
         loop {
             async_runtime::spawn_blocking(|| {
-                std::thread::sleep(Duration::from_secs(5));
+                std::thread::sleep(Duration::from_secs(TRACK_INTERVAL));
             })
             .await
             .ok();
 
-            let mut active_app = get_active_app();
-            /* println!("active app1: {:?}", active_app); */
-            active_app = active_app
-            .filter(|app| !is_system_app(app));
-
-        /* println!("active app2: {:?}", active_app); */
-
+            let mut active_app = get_active_app()
+                .filter(|app| !is_system_app(app));
 
             let mut current = current_app.lock().unwrap();
             let mut start = start_time.lock().unwrap();
 
+            // 🟢 CASE 1: Active app exists
             if let Some(app_name) = &active_app {
+                // 🔁 App changed → context switch
                 if current.as_ref() != Some(app_name) {
                     if let Some(prev_app) = current.as_ref() {
                         let elapsed = start.elapsed().as_secs() as i64;
+
                         if elapsed > 0 {
                             let today = Local::now().format("%Y-%m-%d").to_string();
                             db::add_usage(prev_app, &today, elapsed);
+
+                            if elapsed <= CONTEXT_SWITCH_THRESHOLD {
+                                db::add_context_switch(prev_app, app_name, elapsed);
+                            }
                         }
                     }
 
                     *current = Some(app_name.clone());
                     *start = std::time::Instant::now();
                 }
-            } else if current.is_some() {
-                if let Some(prev_app) = current.take() {
+                // ⏱️ SAME app → periodic flush
+                else {
                     let elapsed = start.elapsed().as_secs() as i64;
-                    if elapsed > 0 {
+                    if elapsed >= FLUSH_INTERVAL {
                         let today = Local::now().format("%Y-%m-%d").to_string();
-                        db::add_usage(&prev_app, &today, elapsed);
+                        db::add_usage(app_name, &today, elapsed);
+                        *start = std::time::Instant::now();
                     }
+                }
+            }
+            // 🔴 CASE 2: No active app (app closed / desktop)
+            else if let Some(prev_app) = current.take() {
+                let elapsed = start.elapsed().as_secs() as i64;
+                if elapsed > 0 {
+                    let today = Local::now().format("%Y-%m-%d").to_string();
+                    db::add_usage(&prev_app, &today, elapsed);
                 }
                 *start = std::time::Instant::now();
             }
         }
     });
 }
+
 
 fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     let quit = MenuItem::with_id(app, "quit", "Quit", true, Option::<&str>::None)?;

@@ -1,6 +1,4 @@
-
 const appMap = {
-  // 🧠 Dev tools
   "devenv.exe": "Visual Studio",
   "code.exe": "VS Code",
   "code-insiders.exe": "VS Code Insiders",
@@ -23,14 +21,12 @@ const appMap = {
   "cmd.exe": "Command Prompt",
   "windowsterminal.exe": "Windows Terminal",
 
-  // 🌐 Browsers
   "chrome.exe": "Google Chrome",
   "msedge.exe": "Microsoft Edge",
   "firefox.exe": "Firefox",
   "brave.exe": "Brave Browser",
   "opera.exe": "Opera",
 
-  // 🖥️ Windows apps
   "explorer.exe": "File Explorer",
   "taskmgr.exe": "Task Manager",
   "control.exe": "Control Panel",
@@ -40,38 +36,41 @@ const appMap = {
   "mspaint.exe": "Paint",
   "photos.exe": "Photos",
 
-  // 🧑‍💻 Communication
   "slack.exe": "Slack",
   "discord.exe": "Discord",
   "teams.exe": "Microsoft Teams",
   "zoom.exe": "Zoom",
 
-  // 🧘 Your app
   "app.exe": "Dev Wellbeing",
 };
-
 
 export function formatAppName(rawPath) {
   if (!rawPath) return "";
 
-  const parts = rawPath.split(/[/\\]/);
-  const rawName = parts[parts.length - 1];
-  const exeName = rawName.toLowerCase();
+  let name = rawPath.split(/[/\\]/).pop();
 
-  if (appMap[exeName]) {
-    return appMap[exeName];
+  name = name.split(" ")[0];
+
+  name = name.toLowerCase();
+
+  if (!name.endsWith(".exe")) {
+    name += ".exe";
   }
 
-  // Fallback formatting
-  let cleaned = rawName.replace(/\.exe$/i, "");
+  if (appMap[name]) {
+    return appMap[name];
+  }
 
-  cleaned = cleaned.replace(/([a-zA-Z])(\d)/g, "$1 $2");
-  cleaned = cleaned.replace(/([a-z])([A-Z])/g, "$1 $2");
+  let cleaned = name.replace(/\.exe$/, "");
 
   cleaned = cleaned
-    .split(/[\s-_]+/)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([a-zA-Z])(\d)/g, "$1 $2")
+    .replace(/[-_]+/g, " ")
+    .trim();
 
-  return cleaned;
+  return cleaned
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }

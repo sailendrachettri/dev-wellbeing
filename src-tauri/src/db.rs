@@ -19,6 +19,18 @@ fn get_db() -> Result<Connection> {
         [],
     )?;
 
+     // 🧠 Context switching table
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS context_switches (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            from_app TEXT NOT NULL,
+            to_app TEXT NOT NULL,
+            timestamp TEXT NOT NULL,
+            delta_seconds INTEGER NOT NULL
+        )",
+        [],
+    )?;
+
     Ok(conn)
 }
 
@@ -27,6 +39,15 @@ pub struct DailyTotalUsage {
     pub date: String, // "2026-01-07"
     pub total_seconds: i64,
 }
+
+#[derive(serde::Serialize)]
+pub struct ContextSwitch {
+    pub from_app: String,
+    pub to_app: String,
+    pub delta_seconds: i64,
+    pub timestamp: String,
+}
+
 
 // pub fn delete_all_entries() -> Result<()> {
 //     let conn = get_db()?;
@@ -42,6 +63,46 @@ pub fn get_earliest_date(conn: &Connection) -> Result<String> {
     let earliest_date: String = stmt.query_row([], |row| row.get(0))?;
     Ok(earliest_date)
 }
+
+pub fn add_context_switch(
+    from_app: &str,
+    to_app: &str,
+    delta_seconds: i64,
+) {
+    let conn = get_db().unwrap();
+    let timestamp = chrono::Local::now().to_rfc3339();
+
+    conn.execute(
+        "INSERT INTO context_switches (from_app, to_app, timestamp, delta_seconds)
+         VALUES (?, ?, ?, ?)",
+        params![from_app, to_app, timestamp, delta_seconds],
+    )
+    .unwrap();
+}
+
+pub fn get_context_switches_by_date(date: &str) -> Result<Vec<ContextSwitch>> {
+    let conn = get_db()?;
+
+    let mut stmt = conn.prepare(
+        "SELECT from_app, to_app, delta_seconds, timestamp
+         FROM context_switches
+         WHERE DATE(timestamp) = ?
+         ORDER BY timestamp DESC",
+    )?;
+
+    let rows = stmt.query_map([date], |row| {
+        Ok(ContextSwitch {
+            from_app: row.get(0)?,
+            to_app: row.get(1)?,
+            delta_seconds: row.get(2)?,
+            timestamp: row.get(3)?,
+        })
+    })?;
+
+    Ok(rows.filter_map(Result::ok).collect())
+}
+
+
 
 pub fn get_week_timeline_usage(
     start_of_week: &str, // "YYYY-MM-DD"

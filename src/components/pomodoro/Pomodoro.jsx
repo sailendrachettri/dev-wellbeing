@@ -119,145 +119,162 @@ const Pomodoro = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center flex-col shadow-md mb-4  mx-5 min-h-[85vh] rounded-lg overflow-hidden">
-      <div className="w-full max-w-md px-6 text-slate-200 ">
-        <div className="flex items-center justify-center flex-col">
-          {/* Time Selection */}
-          <div className="flex items-center gap-x-4 mb-2">
-            <button
-              onClick={() => setPreset(25)}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition
+    <>
+      <div className="flex items-center justify-center flex-col shadow-md mb-4  mx-5 min-h-[85vh] rounded-lg overflow-hidden">
+        <div className="w-full max-w-md px-6 text-slate-200 ">
+          <div className="flex items-center justify-center flex-col">
+            {/* Time Selection */}
+            <div className="flex items-center gap-x-4 mb-2">
+              <button
+                onClick={() => setPreset(25)}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition
     ${
       activePreset === 25
         ? "bg-primary text-white"
         : "bg-gray-100 text-gray-700 hover:bg-slate-100  cursor-pointer"
     }`}
-            >
-              25 min
-            </button>
+              >
+                25 min
+              </button>
 
-            <button
-              onClick={() => setPreset(45)}
-              className={`px-3 py-1 text-xs font-semibold rounded-full transition
+              <button
+                onClick={() => setPreset(45)}
+                className={`px-3 py-1 text-xs font-semibold rounded-full transition
     ${
       activePreset === 45
         ? "bg-primary text-white"
         : "bg-gray-100 text-gray-700 hover:bg-slate-100  cursor-pointer"
     }`}
-            >
-              45 min
-            </button>
+              >
+                45 min
+              </button>
 
-            <div className="flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={customMinutes}
-                onChange={(e) => setCustomMinutes(Number(e.target.value))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    applyCustomTime();
-                  }
-                }}
-                className="w-10 text-center text-xs font-semibold bg-transparent outline-none
+              <div className="flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={customMinutes}
+                  onChange={(e) => setCustomMinutes(Number(e.target.value))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      applyCustomTime();
+                    }
+                  }}
+                  className="w-10 text-center text-xs font-semibold bg-transparent outline-none
                  [appearance:textfield]
                  [&::-webkit-outer-spin-button]:appearance-none
                  [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <span className="text-xs text-gray-400">m</span>
+                />
+                <span className="text-xs text-gray-400">m</span>
 
-              <button
-                onClick={applyCustomTime}
-                className="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary text-white hover:bg-primary/90 cursor-pointer transition"
-              >
-                Go
-              </button>
+                <button
+                  onClick={applyCustomTime}
+                  className="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary text-white hover:bg-primary/90 cursor-pointer transition"
+                >
+                  Go
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Circular Timer */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="relative">
-              {/* SVG Circle */}
-              <svg className="transform -rotate-90" width="320" height="320">
-                {/* Background Circle */}
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="140"
-                  stroke="#e6e2e2"
-                  strokeWidth="12"
-                  fill="none"
-                />
-                {/* Progress Circle */}
-                <circle
-                  cx="160"
-                  cy="160"
-                  r="140"
-                  stroke="#42eca0"
-                  strokeWidth="12"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={strokeDashoffset}
-                  className="transition-all duration-1000 ease-linear"
-                />
-                <defs>
-                  <linearGradient
-                    id="gradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="100%"
-                    y2="100%"
-                  >
-                    <stop offset="0%" stopColor="#f97316" />
-                    <stop offset="100%" stopColor="#dc2626" />
-                  </linearGradient>
-                </defs>
-              </svg>
+            {/* Circular Timer */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="relative">
+                {/* SVG Circle */}
+                <svg className="transform -rotate-90" width="320" height="320">
+                  {/* Background Circle */}
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="140"
+                    stroke="#e6e2e2"
+                    strokeWidth="12"
+                    fill="none"
+                  />
+                  {/* Progress Circle */}
+                  <circle
+                    cx="160"
+                    cy="160"
+                    r="140"
+                    stroke="#42eca0"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    className="transition-all duration-1000 ease-linear"
+                  />
+                  <defs>
+                    <linearGradient
+                      id="gradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="#f97316" />
+                      <stop offset="100%" stopColor="#dc2626" />
+                    </linearGradient>
+                  </defs>
+                </svg>
 
-              {/* Time Display */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-6xl font-bold  tracking-tight">
-                    {formatTime(secondsLeft)}
-                  </div>
-                  <div className="text-sm text-gray-500 mt-2 font-medium">
-                    {isRunning ? "Focus Time" : "Ready to focus?"}
+                {/* Time Display */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl font-bold  tracking-tight">
+                      {formatTime(secondsLeft)}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-2 font-medium">
+                      {isRunning ? "Focus Time" : "Ready to focus?"}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Control Buttons */}
-          <div className="flex items-center justify-center w-full ps-12 gap-4">
-            <button
-              onClick={reset}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-all hover:scale-105 active:scale-95"
-              title="Reset"
-            >
-              <FaRedo className="w-4 h-4 text-primary/70" />
-            </button>
+            {/* Control Buttons */}
+            <div className="flex items-center justify-center w-full ps-12 gap-4">
+              <button
+                onClick={reset}
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-all hover:scale-105 active:scale-95"
+                title="Reset"
+              >
+                <FaRedo className="w-4 h-4 text-primary/70" />
+              </button>
 
-            <button
-              onClick={isRunning ? pause : start}
-              className="p-4 rounded-full  bg-primary cursor-pointer hover:bg-primary/90"
-              title={isRunning ? "Pause" : "Start"}
-            >
-              {isRunning ? (
-                <FaPause className="w-6 h-6 text-white" />
-              ) : (
-                <FaPlay className="w-6 h-6 text-white" />
-              )}
-            </button>
+              <button
+                onClick={isRunning ? pause : start}
+                className="p-4 rounded-full  bg-primary cursor-pointer hover:bg-primary/90"
+                title={isRunning ? "Pause" : "Start"}
+              >
+                {isRunning ? (
+                  <FaPause className="w-6 h-6 text-white" />
+                ) : (
+                  <FaPlay className="w-6 h-6 text-white" />
+                )}
+              </button>
 
-            <div className="w-14 h-14"></div>
+              <div className="w-14 h-14"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Description */}
+      <div className="text-xs text-slate-500 px-3 pb-3 text-center">
+        <div className="leading-relaxed">
+          <div>Work in focused intervals with short breaks in between.</div>
+          <div>
+            Pomodoro helps you
+            <span className="text-slate-400 font-medium">
+              {" "}
+              stay productive{" "}
+            </span>
+            without burning out.
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -53,30 +53,16 @@ export default function ContextSwitchPanel() {
       .catch(console.error);
   }, [selectedDate]);
 
-  const topTransition = useMemo(() => getTopTransition(switches), [switches]);
-
   const topBackAndForth = useMemo(
     () => getTopBackAndForth(switches),
     [switches],
   );
-
-  const formattedTopTransition = useMemo(() => {
-    if (!topTransition) return "—";
-
-    const [pair] = topTransition;
-    const [a, b] = pair.split("↔");
-
-    console.log("a ", a);
-    console.log("b ", b);
-    return `${formatAppName(a)} ♾️ ${formatAppName(b)}`;
-  }, [topTransition]);
 
   const total = switches.length;
   const hoursPassed = Math.max(1, new Date().getHours());
   const perHour = (total / hoursPassed).toFixed(1);
 
   const visibleSwitches = showAll ? switches : switches.slice(0, MAX_VISIBLE);
-  console.log(visibleSwitches);
 
   return (
     <>
@@ -127,18 +113,14 @@ export default function ContextSwitchPanel() {
                 <span className="flex items-center gap-2 truncate">
                   {/* App names */}
                   <span className="flex items-center gap-1 text-sm font-semibold text-white truncate">
-                    <span >
-                      {formatAppName(topBackAndForth.app1)}
-                    </span>
+                    <span>{formatAppName(topBackAndForth.app1)}</span>
 
                     <IoInfiniteOutline
                       size={14}
                       className="text-slate-400 shrink-0"
                     />
 
-                    <span >
-                      {formatAppName(topBackAndForth.app2)}
-                    </span>
+                    <span>{formatAppName(topBackAndForth.app2)}</span>
                   </span>
 
                   {/* Count */}

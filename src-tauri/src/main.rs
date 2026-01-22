@@ -97,17 +97,18 @@ fn main() {
             get_usage_by_date,
             get_week_timeline_usage,
             get_earliest_usage_date,
-            get_today_context_switches
+            get_context_switches_by_date
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
 
 
-#[command]
-fn get_today_context_switches() -> Vec<db::ContextSwitch> {
-    db::get_today_context_switches().unwrap_or_default()
+#[tauri::command]
+fn get_context_switches_by_date(date: String) -> Vec<db::ContextSwitch> {
+    db::get_context_switches_by_date(&date).unwrap_or_default()
 }
+
 
 
 

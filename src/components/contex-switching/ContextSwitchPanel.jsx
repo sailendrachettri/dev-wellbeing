@@ -5,18 +5,42 @@ import { formatAppName } from "../../utils/string-formate/formatAppName";
 import { TiFlowSwitch } from "react-icons/ti";
 import { getTopTransition } from "../../utils/matix/getTopTransition";
 import Metric from "../../utils/matix/Metric";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
+
+const getToday = () => new Date().toISOString().slice(0, 10);
+
+const addDays = (dateStr, days) => {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};
+
+const isToday = (dateStr) => dateStr === getToday();
 
 const MAX_VISIBLE = 5;
-
-
 
 export default function ContextSwitchPanel() {
   const [switches, setSwitches] = useState([]);
   const [showAll, setShowAll] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(getToday);
+
+  const handlePrevDay = () => {
+    setSelectedDate((d) => addDays(d, -1));
+  };
+
+  const handleNextDay = () => {
+    if (isToday(selectedDate)) return; // no future
+    setSelectedDate((d) => addDays(d, 1));
+  };
 
   useEffect(() => {
-    invoke("get_today_context_switches").then(setSwitches).catch(console.error);
-  }, []);
+    if (!selectedDate) return;
+
+    invoke("get_context_switches_by_date", { date: selectedDate })
+      .then(setSwitches)
+      .catch(console.error);
+  }, [selectedDate]);
 
   const total = switches.length;
   const hoursPassed = Math.max(1, new Date().getHours());
@@ -35,7 +59,33 @@ export default function ContextSwitchPanel() {
             <TiFlowSwitch size={22} />
             Context Switching
           </h2>
-          <span className="text-sm text-slate-400">Today</span>
+
+          <div className="flex items-center gap-x-3 text-slate-400">
+            {/* Left arrow */}
+            <button
+              onClick={handlePrevDay}
+              className="hover:text-white transition"
+              title="Previous day"
+            >
+              <IoIosArrowBack size={18} className="cursor-pointer" />
+            </button>
+
+            {/* Date label */}
+            <span className="text-sm">
+              {isToday(selectedDate) ? "Today" : formatPrettyDate(selectedDate)}
+            </span>
+
+            {/* Right arrow (hidden on today) */}
+            {!isToday(selectedDate) && (
+              <button
+                onClick={handleNextDay}
+                className="hover:text-white transition"
+                title="Next day"
+              >
+                <IoIosArrowForward size={18} className="cursor-pointer" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Metrics */}
@@ -48,7 +98,6 @@ export default function ContextSwitchPanel() {
             truncate
           />
         </div>
-
 
         {/* Recent switches */}
         <div className="space-y-2">
@@ -100,8 +149,3 @@ export default function ContextSwitchPanel() {
     </>
   );
 }
-
-
-
-
-

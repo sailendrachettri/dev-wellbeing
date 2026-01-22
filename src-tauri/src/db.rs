@@ -80,9 +80,8 @@ pub fn add_context_switch(
     .unwrap();
 }
 
-pub fn get_today_context_switches() -> Result<Vec<ContextSwitch>> {
+pub fn get_context_switches_by_date(date: &str) -> Result<Vec<ContextSwitch>> {
     let conn = get_db()?;
-    let today = chrono::Local::now().format("%Y-%m-%d").to_string();
 
     let mut stmt = conn.prepare(
         "SELECT from_app, to_app, delta_seconds, timestamp
@@ -91,7 +90,7 @@ pub fn get_today_context_switches() -> Result<Vec<ContextSwitch>> {
          ORDER BY timestamp DESC",
     )?;
 
-    let rows = stmt.query_map([today], |row| {
+    let rows = stmt.query_map([date], |row| {
         Ok(ContextSwitch {
             from_app: row.get(0)?,
             to_app: row.get(1)?,
@@ -102,6 +101,7 @@ pub fn get_today_context_switches() -> Result<Vec<ContextSwitch>> {
 
     Ok(rows.filter_map(Result::ok).collect())
 }
+
 
 
 pub fn get_week_timeline_usage(

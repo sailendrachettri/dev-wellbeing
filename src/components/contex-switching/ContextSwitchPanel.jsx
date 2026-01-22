@@ -10,6 +10,7 @@ import {
 import Metric from "../../utils/matix/Metric";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
+import { IoInfiniteOutline } from "react-icons/io5";
 
 const toLocalDateString = (date = new Date()) => {
   const y = date.getFullYear();
@@ -122,11 +123,32 @@ export default function ContextSwitchPanel() {
           <Metric
             label="Top Trigger"
             value={
-              topBackAndForth
-                ? `${formatAppName(topBackAndForth.app1)} ♾️ ${formatAppName(
-                    topBackAndForth.app2,
-                  )} (x${topBackAndForth.count})`
-                : "—"
+              topBackAndForth ? (
+                <span className="flex items-center gap-2 truncate">
+                  {/* App names */}
+                  <span className="flex items-center gap-1 text-sm font-semibold text-white truncate">
+                    <span >
+                      {formatAppName(topBackAndForth.app1)}
+                    </span>
+
+                    <IoInfiniteOutline
+                      size={14}
+                      className="text-slate-400 shrink-0"
+                    />
+
+                    <span >
+                      {formatAppName(topBackAndForth.app2)}
+                    </span>
+                  </span>
+
+                  {/* Count */}
+                  <span className="text-[11px] text-slate-500 font-medium shrink-0">
+                    ×{topBackAndForth.count}
+                  </span>
+                </span>
+              ) : (
+                "—"
+              )
             }
           />
         </div>

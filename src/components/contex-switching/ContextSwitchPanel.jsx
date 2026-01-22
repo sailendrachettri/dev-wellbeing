@@ -8,12 +8,19 @@ import Metric from "../../utils/matix/Metric";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
 
-const getToday = () => new Date().toISOString().slice(0, 10);
+const toLocalDateString = (date = new Date()) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+const getToday = () => toLocalDateString();
 
 const addDays = (dateStr, days) => {
-  const d = new Date(dateStr);
+  const d = new Date(`${dateStr}T00:00:00`); // force local
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return toLocalDateString(d);
 };
 
 const isToday = (dateStr) => dateStr === getToday();
@@ -141,9 +148,9 @@ export default function ContextSwitchPanel() {
             Context switching happens when you frequently jump between apps (for
             example: Editor → Browser → Chat → Editor).
           </div>
-          <div>
-            Frequent switching increases mental load and reduces deep focus.
-            This metric helps you spot distraction patterns.
+          <div>Switches made after
+            <span className="text-slate-400 font-medium"> 30 seconds </span>
+            are treated as focused work and aren’t shown here.
           </div>
         </div>
       </div>

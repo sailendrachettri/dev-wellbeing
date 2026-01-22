@@ -3,7 +3,10 @@ import { invoke } from "@tauri-apps/api/core";
 import { formatSeconds } from "../../utils/date-time/formatSeconds";
 import { formatAppName } from "../../utils/string-formate/formatAppName";
 import { TiFlowSwitch } from "react-icons/ti";
-import { getTopTransition } from "../../utils/matix/getTopTransition";
+import {
+  getTopBackAndForth,
+  getTopTransition,
+} from "../../utils/matix/getTopTransition";
 import Metric from "../../utils/matix/Metric";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
@@ -49,11 +52,27 @@ export default function ContextSwitchPanel() {
       .catch(console.error);
   }, [selectedDate]);
 
+  const topTransition = useMemo(() => getTopTransition(switches), [switches]);
+
+  const topBackAndForth = useMemo(
+    () => getTopBackAndForth(switches),
+    [switches],
+  );
+
+  const formattedTopTransition = useMemo(() => {
+    if (!topTransition) return "—";
+
+    const [pair] = topTransition;
+    const [a, b] = pair.split("↔");
+
+    console.log("a ", a);
+    console.log("b ", b);
+    return `${formatAppName(a)} ♾️ ${formatAppName(b)}`;
+  }, [topTransition]);
+
   const total = switches.length;
   const hoursPassed = Math.max(1, new Date().getHours());
   const perHour = (total / hoursPassed).toFixed(1);
-
-  const topTransition = useMemo(() => getTopTransition(switches), [switches]);
 
   const visibleSwitches = showAll ? switches : switches.slice(0, MAX_VISIBLE);
   console.log(visibleSwitches);
@@ -102,8 +121,13 @@ export default function ContextSwitchPanel() {
           <Metric label="Per Hour" value={perHour} />
           <Metric
             label="Top Trigger"
-            value={topTransition ? formatAppName(topTransition[0]) : "—"}
-            truncate
+            value={
+              topBackAndForth
+                ? `${formatAppName(topBackAndForth.app1)} ♾️ ${formatAppName(
+                    topBackAndForth.app2,
+                  )} (x${topBackAndForth.count})`
+                : "—"
+            }
           />
         </div>
 
@@ -148,7 +172,8 @@ export default function ContextSwitchPanel() {
             Context switching happens when you frequently jump between apps (for
             example: Editor → Browser → Chat → Editor).
           </div>
-          <div>Switches made after
+          <div>
+            Switches made after
             <span className="text-slate-400 font-medium"> 30 seconds </span>
             are treated as focused work and aren’t shown here.
           </div>

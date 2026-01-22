@@ -28,7 +28,7 @@ export default function ContextSwitchPanel() {
 
   return (
     <>
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 m-2 mt-5">
+      <div className="bg-zinc-900 border min-h-[70vh] border-zinc-800 rounded-xl p-5 space-y-4 m-2 mt-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-white flex gap-x-2 items-center">

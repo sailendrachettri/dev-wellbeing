@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { formatDateShort } from "./formatDateShort";
 import { getTodayDate } from "./getTodayDate";
 
-const TimeLineDatePicker = ({ selectedDate, setSelectedDate }) => {
+const DatePickerAndSelection = ({ selectedDate, setSelectedDate }) => {
   const inputRef = useRef(null);
 
   const handleIconClick = () => {
@@ -38,4 +38,4 @@ const TimeLineDatePicker = ({ selectedDate, setSelectedDate }) => {
   );
 };
 
-export default TimeLineDatePicker;
+export default DatePickerAndSelection;

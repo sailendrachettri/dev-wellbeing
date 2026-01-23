@@ -11,6 +11,7 @@ import Metric from "../../utils/matix/Metric";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { formatPrettyDate } from "../../utils/date-time/formatPrettyDate";
 import { IoInfiniteOutline } from "react-icons/io5";
+import DatePickerAndSelection from "../../utils/date-time/DatePickerAndSelection";
 
 const toLocalDateString = (date = new Date()) => {
   const y = date.getFullYear();
@@ -85,9 +86,11 @@ export default function ContextSwitchPanel() {
             </button>
 
             {/* Date label */}
-            <span className="text-sm">
+            {/* <span className="text-sm">
               {isToday(selectedDate) ? "Today" : formatPrettyDate(selectedDate)}
-            </span>
+            </span> */}
+
+            <DatePickerAndSelection selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
             {/* Right arrow (hidden on today) */}
             {!isToday(selectedDate) && (

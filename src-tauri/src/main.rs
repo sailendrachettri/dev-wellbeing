@@ -36,7 +36,7 @@ struct ActiveAppState {
 }
 
 fn main() {
-    // db::delete_all_entries()?;
+   
 
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -45,7 +45,7 @@ fn main() {
                 let _ = win.show();
                 let _ = win.set_focus();
 
-                // Windows focus reliability trick
+               
                 let _ = win.set_always_on_top(true);
                 let _ = win.set_always_on_top(false);
             }
@@ -167,15 +167,15 @@ fn start_background_tracking(app: AppHandle) {
             .await
             .ok();
 
-            let mut active_app = get_active_app()
+            let  active_app = get_active_app()
                 .filter(|app| !is_system_app(app));
 
             let mut current = current_app.lock().unwrap();
             let mut start = start_time.lock().unwrap();
 
-            // 🟢 CASE 1: Active app exists
+           
             if let Some(app_name) = &active_app {
-                // 🔁 App changed → context switch
+               
                 if current.as_ref() != Some(app_name) {
                     if let Some(prev_app) = current.as_ref() {
                         let elapsed = start.elapsed().as_secs() as i64;
@@ -193,7 +193,7 @@ fn start_background_tracking(app: AppHandle) {
                     *current = Some(app_name.clone());
                     *start = std::time::Instant::now();
                 }
-                // ⏱️ SAME app → periodic flush
+               
                 else {
                     let elapsed = start.elapsed().as_secs() as i64;
                     if elapsed >= FLUSH_INTERVAL {
@@ -203,7 +203,7 @@ fn start_background_tracking(app: AppHandle) {
                     }
                 }
             }
-            // 🔴 CASE 2: No active app (app closed / desktop)
+           
             else if let Some(prev_app) = current.take() {
                 let elapsed = start.elapsed().as_secs() as i64;
                 if elapsed > 0 {
@@ -284,7 +284,7 @@ fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
 
 //     let conn = Connection::open(path).map_err(|e| e.to_string())?;
 
-//     // 1. Remove system apps
+//    
 //     db::delete_system_apps(&conn).map_err(|e| e.to_string())?;
 //     Ok(())
 // }
@@ -369,8 +369,8 @@ fn get_active_app() -> Option<String> {
         .ok()?;
 
         let full_path = String::from_utf16_lossy(&buffer[..size as usize]);
-        // println!("path: {}", full_path);
+       
 
-        Some(full_path) // ✅ return the full path
+        Some(full_path)
     }
 }

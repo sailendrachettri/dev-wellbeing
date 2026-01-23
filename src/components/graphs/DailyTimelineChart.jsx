@@ -15,6 +15,8 @@ import { addDays } from "../../utils/date-time/addDays";
 import { getTodayDate } from "../../utils/date-time/getTodayDate";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { formatDateShort } from "../../utils/date-time/formatDateShort";
+import { IoCalendarOutline } from "react-icons/io5";
+import TimeLineDatePicker from "../../utils/date-time/TimeLineDatePicker";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -243,7 +245,12 @@ const DailyTimelineChart = ({ setSelectedDate, selectedDate }) => {
           <IoIosArrowDropleft size={22} />
         </button>
 
-        <div>{formatDateShort(selectedDate)}</div>
+        <div>
+          <TimeLineDatePicker
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
+        </div>
 
         <button
           disabled={selectedDate >= getTodayDate()}
